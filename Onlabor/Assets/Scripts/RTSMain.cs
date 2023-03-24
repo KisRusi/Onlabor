@@ -5,10 +5,17 @@ using UnityEngine;
 public class RTSMain : MonoBehaviour
 {
     private List<RtsUnit> selectedUnits;
+    [SerializeField]private Player player;
+
+    private void Start()
+    {
+        player = GameObject.Find("Player").GetComponent<Player>();
+    }
 
     private void Awake()
     {
         selectedUnits = new List<RtsUnit>();
+        
     }
     // Update is called once per frame
     private void Update()
@@ -19,6 +26,10 @@ public class RTSMain : MonoBehaviour
             foreach (var unit in selectedUnits) 
             {
                 unit.MoveToDestination(MoveToClick.GetMousePosition());
+            }
+            if(player.IsSelected)
+            {
+                player.MoveToDestination(MoveToClick.GetMousePosition());
             }
             
         }
@@ -33,6 +44,11 @@ public class RTSMain : MonoBehaviour
                     unit.SetSelected(true);
                     selectedUnits.Add(unit);
                 }
+                if(raycastHit.collider.GetComponent<Player>())
+                {
+                    player.IsSelected = true;
+                    Debug.Log(player.IsSelected);
+                }
             }
         }
     }
@@ -43,6 +59,7 @@ public class RTSMain : MonoBehaviour
         {
             unit.SetSelected(false);
         }
+        player.IsSelected = false;
         selectedUnits.Clear();
     }
 }

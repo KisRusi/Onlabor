@@ -10,10 +10,19 @@ public class Player : MonoBehaviour
 
     private NavMeshAgent navMeshAgent;
     private bool isSelected;
+    private GameObject selectedCircle;
+
+    public bool IsSelected{
+        set { isSelected = value;
+            selectedCircle.SetActive(value);
+        }
+        get { return isSelected; }
+        }
     private void Awake()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
-        
+        selectedCircle = transform.Find("Selected").gameObject;
+        SetSelected(false);
     }
 
     // Update is called once per frame
@@ -27,8 +36,8 @@ public class Player : MonoBehaviour
         navMeshAgent.SetDestination(destination);
     }
 
-    public void setSelected(bool select)
+    public void SetSelected(bool isSelected)
     {
-
+        selectedCircle.SetActive(isSelected);
     }
 }

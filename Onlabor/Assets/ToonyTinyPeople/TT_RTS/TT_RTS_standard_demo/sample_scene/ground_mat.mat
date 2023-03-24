@@ -96,7 +96,6 @@ Material:
     - _Smoothness3: 0.5
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
 --- !u!114 &5851774969619659901
 MonoBehaviour:
