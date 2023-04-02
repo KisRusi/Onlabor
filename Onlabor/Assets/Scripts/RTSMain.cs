@@ -23,6 +23,7 @@ public class RTSMain : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
+        
 
         if (Input.GetMouseButtonDown(1))
         {
@@ -41,8 +42,22 @@ public class RTSMain : MonoBehaviour
         {
             selectedArea.gameObject.SetActive(true);
             startpos = MoveToClick.GetMousePosition();
-            UnSelectUnits();
-            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit raycastHit))
+            
+            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit raycastHit1) && Input.GetKey(KeyCode.LeftShift))
+            {
+                if (raycastHit1.collider.TryGetComponent<RtsUnit>(out RtsUnit unit))
+                {
+                    unit.SetSelected(true);
+                    selectedUnits.Add(unit);
+                }
+                if(raycastHit1.collider.GetComponent<Player>())
+                {
+                    player.IsSelected = true;
+                
+                }
+                return;
+            }
+            else if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit raycastHit))
             {
                 if (raycastHit.collider.TryGetComponent<RtsUnit>(out RtsUnit unit))
                 {
@@ -55,6 +70,7 @@ public class RTSMain : MonoBehaviour
                 
                 }
             }
+            UnSelectUnits();
         }
 
         if(Input.GetMouseButton(0))
@@ -102,6 +118,8 @@ public class RTSMain : MonoBehaviour
                 }
             }
         }
+
+        
     }
 
     private void UnSelectUnits()
