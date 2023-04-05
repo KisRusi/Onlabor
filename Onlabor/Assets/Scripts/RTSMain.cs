@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using UnityEngine;
 
 public class RTSMain : MonoBehaviour
@@ -18,6 +19,11 @@ public class RTSMain : MonoBehaviour
     {
         selectedUnits = new List<RtsUnit>();
         selectedArea.gameObject.SetActive(false);
+        
+    }
+
+    private void FixedUpdate()
+    {
         
     }
     // Update is called once per frame

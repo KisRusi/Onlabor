@@ -22,7 +22,7 @@ public class CameraSystem : MonoBehaviour
             HandleCameraMovement_EdgeScroll();
         }
 
-        HandleCameraRotation();
+        
         HandleCameraZoom();
 
     }
@@ -58,16 +58,6 @@ public class CameraSystem : MonoBehaviour
         float moveSpeed = 20f;
         transform.position += moveDir * moveSpeed * Time.deltaTime;
 
-    }
-
-    private void HandleCameraRotation() 
-    {
-        float rotateDir = 0f;
-        if (Input.GetKey(KeyCode.Q)) rotateDir += 1f;
-        if (Input.GetKey(KeyCode.E)) rotateDir -= 1f;
-
-        float rotateSpeed = 100f;
-        transform.eulerAngles += new Vector3(0, rotateDir * rotateSpeed * Time.deltaTime, 0);
     }
 
     private void HandleCameraZoom()

@@ -17,14 +17,5 @@ public class MoveToClick : MonoBehaviour
             return Vector3.zero; 
         }
     }
-
-    // public static Vector3 MouseDrag()
-    // {
-    //     Vector3 startpos;
-    //     Vector3 endpos;
-
-    // }
-
-
     
 }
