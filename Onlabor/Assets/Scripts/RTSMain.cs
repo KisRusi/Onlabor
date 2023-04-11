@@ -33,14 +33,28 @@ public class RTSMain : MonoBehaviour
 
         if (Input.GetMouseButtonDown(1))
         {
-            foreach (var unit in selectedUnits) 
+            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit raycastHit))
             {
-                unit.MoveToDestination(MoveToClick.GetMousePosition());
+                if(raycastHit.collider.TryGetComponent<ResourceNode>(out ResourceNode resourceNode))
+                {
+                    foreach (var unit in selectedUnits)
+                    {
+                        unit.SetResourceNode(resourceNode);
+                    }
+                }
+                else
+                {
+                    foreach (var unit in selectedUnits)
+                    {
+                        unit.MoveAndResetState(MoveToClick.GetMousePosition());
+                    }
+                    if (player.IsSelected)
+                    {
+                        player.MoveToDestination(MoveToClick.GetMousePosition());
+                    }
+                }
             }
-            if(player.IsSelected)
-            {
-                player.MoveToDestination(MoveToClick.GetMousePosition());
-            }
+            
             
         }
 
