@@ -1,16 +1,24 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class BuildingManager : MonoBehaviour
+public  class BuildingManager : MonoBehaviour
 {
     public GameObject[] objects;
     private GameObject pendingObject;
     private Vector3 position;
     private RaycastHit hit;
     public bool canPlace = true;
+    
+
+    public event EventHandler<OnStoragePlaceEventArgs> OnStoragePlaced;
+    public class OnStoragePlaceEventArgs :EventArgs
+    {
+        public GameObject gameObject;
+    }
     
 
     [SerializeField] private LayerMask layerMask;
@@ -49,6 +57,7 @@ public class BuildingManager : MonoBehaviour
     public void PlaceObject()
     {
         pendingObject.GetComponent<MeshRenderer>().material = materials[2];
+        OnStoragePlaced?.Invoke(this, new OnStoragePlaceEventArgs { gameObject = pendingObject.gameObject });
         pendingObject = null;
     }
 

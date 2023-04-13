@@ -11,12 +11,13 @@ GameObject:
   - component: {fileID: 1495421588092898093}
   - component: {fileID: 8668889268462007766}
   - component: {fileID: 6705027131977017135}
+  - component: {fileID: 1792816975310639794}
   - component: {fileID: 3602280955541129536}
   - component: {fileID: 634732039641260199}
   - component: {fileID: 2663314993010388262}
   m_Layer: 0
-  m_Name: Resource
-  m_TagString: Colliding
+  m_Name: ResourceStorage
+  m_TagString: Storage
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 8
@@ -29,7 +30,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5227127387391089767}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -54,6 +55,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 85eb8caa6d5a96c46b08c9e0505769ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1792816975310639794
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5227127387391089767}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ee18ee0e44353d4da4b0dc181b8e026, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!23 &3602280955541129536

@@ -1,3 +1,4 @@
+using Mono.Cecil;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -20,16 +21,30 @@ public class RtsUnit : MonoBehaviour
     private State currentState;
     private GameObject selectedCircle;
     private ResourceNode resourceNode;
+    private GameObject resourceStorage;
     private NavMeshAgent navMeshAgent;
+    BuildingManager buildingManager;
+
+    private void Start()
+    {
+        buildingManager.OnStoragePlaced += BuildingManager_OnStoragePlaced;
+
+    }
     private void Awake()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
         selectedCircle = transform.Find("Selected").gameObject;
         currentState = State.Normal;
+        resourceStorage = GameObject.FindWithTag("Storage");
+        buildingManager = GameObject.Find("BuildingManager").GetComponent<BuildingManager>();
+        Debug.Log(buildingManager);
         SetSelected(false);
     }
     private void Update()
     {
+
+        
+        
         
         switch(currentState)
         {
@@ -46,7 +61,7 @@ public class RtsUnit : MonoBehaviour
                 }
                 break;
             case State.Gathering:
-
+                
                 gatheringTime -= Time.deltaTime;
                 if(gatheringTime < 0)
                 {
@@ -64,10 +79,10 @@ public class RtsUnit : MonoBehaviour
                 break;
             case State.GoingBack_Gathering:
                 
-                Vector3 resourceStorage = new Vector3(1,0,0);
-                MoveToDestination(resourceStorage);
+                //Vector3 resourceStorage = new Vector3(1,0,0);
+                MoveToDestination(resourceStorage.transform.position);
                 reachDestination = 1f;
-                if (Vector3.Distance(transform.position,resourceStorage) <  reachDestination)
+                if (Vector3.Distance(transform.position,resourceStorage.transform.position) <  reachDestination)
                 {
                     
                     resourceAmount = 0;
@@ -77,6 +92,18 @@ public class RtsUnit : MonoBehaviour
 
                 break;
         }
+    }
+
+    private void BuildingManager_OnStoragePlaced(object sender, BuildingManager.OnStoragePlaceEventArgs e)
+    {
+        
+        Debug.Log(e.gameObject.transform.position);
+        GameObject placedResourceStorage = e.gameObject;
+        float distanceToStorage = Vector3.Distance(transform.position, resourceStorage.transform.position);
+        float distanceToPlacedStorage = Vector3.Distance(transform.position,placedResourceStorage.transform.position);
+        if (distanceToPlacedStorage < distanceToStorage)
+            resourceStorage = placedResourceStorage;
+        return;
     }
 
     public void MoveToDestination(Vector3 destination)
@@ -100,4 +127,6 @@ public class RtsUnit : MonoBehaviour
         this.resourceNode = resourceNode;
         currentState = State.GoingTo_Gathering;
     }
+
+    
 }
