@@ -35,7 +35,7 @@ public class RtsUnit : MonoBehaviour
         navMeshAgent = GetComponent<NavMeshAgent>();
         selectedCircle = transform.Find("Selected").gameObject;
         currentState = State.Normal;
-        resourceStorage = GameObject.FindWithTag("Storage");
+        resourceStorage = GameObject.Find("ResourceStorage");
         buildingManager = GameObject.Find("BuildingManager").GetComponent<BuildingManager>();
         Debug.Log(buildingManager);
         SetSelected(false);

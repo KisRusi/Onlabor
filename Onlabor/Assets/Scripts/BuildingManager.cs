@@ -12,6 +12,7 @@ public  class BuildingManager : MonoBehaviour
     private Vector3 position;
     private RaycastHit hit;
     public bool canPlace = true;
+    private bool isStorage = false;
     
 
     public event EventHandler<OnStoragePlaceEventArgs> OnStoragePlaced;
@@ -57,12 +58,21 @@ public  class BuildingManager : MonoBehaviour
     public void PlaceObject()
     {
         pendingObject.GetComponent<MeshRenderer>().material = materials[2];
-        OnStoragePlaced?.Invoke(this, new OnStoragePlaceEventArgs { gameObject = pendingObject.gameObject });
+        if(isStorage)
+        {
+            OnStoragePlaced?.Invoke(this, new OnStoragePlaceEventArgs { gameObject = pendingObject.gameObject });
+        }
+        
         pendingObject = null;
+        isStorage = false;
     }
 
     public void SelectObject(int index)
     {
+        if(index == 0)
+        {
+            isStorage = true;
+        }
         pendingObject = Instantiate(objects[index], position, transform.rotation);
     }
 
