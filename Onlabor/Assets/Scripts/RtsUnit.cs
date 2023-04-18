@@ -37,7 +37,6 @@ public class RtsUnit : MonoBehaviour
         currentState = State.Normal;
         resourceStorage = GameObject.Find("ResourceStorage");
         buildingManager = GameObject.Find("BuildingManager").GetComponent<BuildingManager>();
-        Debug.Log(buildingManager);
         SetSelected(false);
     }
     private void Update()
@@ -97,7 +96,6 @@ public class RtsUnit : MonoBehaviour
     private void BuildingManager_OnStoragePlaced(object sender, BuildingManager.OnStoragePlaceEventArgs e)
     {
         
-        Debug.Log(e.gameObject.transform.position);
         GameObject placedResourceStorage = e.gameObject;
         float distanceToStorage = Vector3.Distance(transform.position, resourceStorage.transform.position);
         float distanceToPlacedStorage = Vector3.Distance(transform.position,placedResourceStorage.transform.position);

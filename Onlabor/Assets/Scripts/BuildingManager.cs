@@ -16,7 +16,13 @@ public  class BuildingManager : MonoBehaviour
     
 
     public event EventHandler<OnStoragePlaceEventArgs> OnStoragePlaced;
+    public event EventHandler<OnBarrackPlaceEventArgs> OnBarrackPlaced;
     public class OnStoragePlaceEventArgs :EventArgs
+    {
+        public GameObject gameObject;
+    }
+
+    public class OnBarrackPlaceEventArgs : EventArgs
     {
         public GameObject gameObject;
     }
@@ -58,10 +64,15 @@ public  class BuildingManager : MonoBehaviour
     public void PlaceObject()
     {
         pendingObject.GetComponent<MeshRenderer>().material = materials[2];
-        if(isStorage)
+        if (isStorage)
         {
             OnStoragePlaced?.Invoke(this, new OnStoragePlaceEventArgs { gameObject = pendingObject.gameObject });
         }
+        else
+        {
+            OnBarrackPlaced?.Invoke(this, new OnBarrackPlaceEventArgs { gameObject = pendingObject.gameObject });
+        }
+        
         
         pendingObject = null;
         isStorage = false;

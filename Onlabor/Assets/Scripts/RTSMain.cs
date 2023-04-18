@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class RTSMain : MonoBehaviour
 {
@@ -9,7 +11,9 @@ public class RTSMain : MonoBehaviour
     [SerializeField]private Player player;
 
     [SerializeField]private Transform selectedArea = null;
+    [SerializeField]private Transform barrackPanel = null;
     private Vector3 startpos;
+    
     private void Start()
     {
         player = GameObject.Find("Player").GetComponent<Player>();
@@ -62,7 +66,22 @@ public class RTSMain : MonoBehaviour
         {
             selectedArea.gameObject.SetActive(true);
             startpos = MoveToClick.GetMousePosition();
-            
+            if(EventSystem.current.IsPointerOverGameObject())
+            {
+                barrackPanel.gameObject.SetActive(true);
+                return;
+            }
+            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit raycastHit2) )
+            {
+                if (raycastHit2.collider.TryGetComponent<Barrack>(out Barrack barrack))
+                {
+                    
+                    barrackPanel.gameObject.SetActive(true);
+                    return;
+                }
+                
+            }
+
             if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit raycastHit1) && Input.GetKey(KeyCode.LeftShift))
             {
                 if (raycastHit1.collider.TryGetComponent<RtsUnit>(out RtsUnit unit))
@@ -91,6 +110,7 @@ public class RTSMain : MonoBehaviour
                 }
             }
             UnSelectUnits();
+            barrackPanel.gameObject.SetActive(false);
         }
 
         if(Input.GetMouseButton(0))
