@@ -19,11 +19,6 @@ public class Barrack : MonoBehaviour
     {
         buildingManager = GameObject.Find("BuildingManager").GetComponent<BuildingManager>();
     }
-    private void Update()
-    {
-        Debug.Log("pos : " + pos);
-        
-    }
 
     public void SpawnUnit()
     {
