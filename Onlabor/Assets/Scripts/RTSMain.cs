@@ -39,7 +39,7 @@ public class RTSMain : MonoBehaviour
         {
             if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit raycastHit))
             {
-                if(raycastHit.collider.TryGetComponent<ResourceNode>(out ResourceNode resourceNode))
+                if (raycastHit.collider.TryGetComponent<ResourceNode>(out ResourceNode resourceNode))
                 {
                     foreach (var unit in selectedUnits)
                     {
@@ -48,13 +48,27 @@ public class RTSMain : MonoBehaviour
                 }
                 else
                 {
-                    foreach (var unit in selectedUnits)
+                    if (raycastHit.collider.TryGetComponent<RtsUnit>(out RtsUnit targetUnit))
                     {
-                        unit.MoveAndResetState(MoveToClick.GetMousePosition());
+                        if (targetUnit.IsEnemy())
+                        {
+                            foreach (var unit in selectedUnits)
+                            {
+                                unit.SetTarget(targetUnit);
+                            }
+                        }
+
                     }
-                    if (player.IsSelected)
+                    else
                     {
-                        player.MoveToDestination(MoveToClick.GetMousePosition());
+                        foreach (var unit in selectedUnits)
+                        {
+                            unit.MoveAndResetState(MoveToClick.GetMousePosition());
+                        }
+                        if (player.IsSelected)
+                        {
+                            player.MoveToDestination(MoveToClick.GetMousePosition());
+                        }
                     }
                 }
             }
@@ -86,8 +100,11 @@ public class RTSMain : MonoBehaviour
             {
                 if (raycastHit1.collider.TryGetComponent<RtsUnit>(out RtsUnit unit))
                 {
-                    unit.SetSelected(true);
-                    selectedUnits.Add(unit);
+                    if(!unit.IsEnemy())
+                    {
+                        unit.SetSelected(true);
+                        selectedUnits.Add(unit);
+                    }
                 }
                 if(raycastHit1.collider.GetComponent<Player>())
                 {
@@ -96,19 +113,7 @@ public class RTSMain : MonoBehaviour
                 }
                 return;
             }
-            else if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit raycastHit))
-            {
-                if (raycastHit.collider.TryGetComponent<RtsUnit>(out RtsUnit unit))
-                {
-                    unit.SetSelected(true);
-                    selectedUnits.Add(unit);
-                }
-                if(raycastHit.collider.GetComponent<Player>())
-                {
-                    player.IsSelected = true;
-                
-                }
-            }
+            
             UnSelectUnits();
             barrackPanel.gameObject.SetActive(false);
         }
@@ -148,8 +153,12 @@ public class RTSMain : MonoBehaviour
             {
                 if (col.TryGetComponent<RtsUnit>(out RtsUnit unit))
                 {
-                    unit.SetSelected(true);
-                    selectedUnits.Add(unit);
+                    if(!unit.IsEnemy())
+                    {
+                        unit.SetSelected(true);
+                        selectedUnits.Add(unit);
+
+                    }
                 }
                 if(col.GetComponent<Player>())
                 {

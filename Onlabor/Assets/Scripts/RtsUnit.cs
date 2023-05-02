@@ -4,16 +4,25 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
+using CodeMonkey.HealthSystemCM;
+using System;
 
-public class RtsUnit : MonoBehaviour
+public class RtsUnit : MonoBehaviour, IGetHealthSystem
 {
+
+    [SerializeField] private bool isEnemy;
+
     public enum State
     {
         Normal,
         GoingTo_Gathering,
         GoingBack_Gathering,
         Gathering,
+        MoveToTarget,
+        Attacking,
     }
+
+    private HealthSystem healthSystem;
 
     private bool isSelected;
     private float gatheringTime;
@@ -24,6 +33,9 @@ public class RtsUnit : MonoBehaviour
     private GameObject resourceStorage;
     private NavMeshAgent navMeshAgent;
     BuildingManager buildingManager;
+    private RtsUnit targetUnit;
+    private float attackTime;
+
 
     private void Start()
     {
@@ -37,14 +49,20 @@ public class RtsUnit : MonoBehaviour
         currentState = State.Normal;
         resourceStorage = GameObject.Find("ResourceStorage");
         buildingManager = GameObject.Find("BuildingManager").GetComponent<BuildingManager>();
+        healthSystem = new HealthSystem(100);
         SetSelected(false);
+
+        healthSystem.OnDead += HealthSystem_OnDead;
     }
+
+    private void HealthSystem_OnDead(object sender, EventArgs e)
+    {
+        Destroy(gameObject);
+    }
+
     private void Update()
     {
 
-        
-        
-        
         switch(currentState)
         {
             case State.Normal:
@@ -87,9 +105,31 @@ public class RtsUnit : MonoBehaviour
                     resourceAmount = 0;
                     currentState = State.GoingTo_Gathering;
                 }
-
-
                 break;
+            case State.MoveToTarget:
+                MoveToDestination(targetUnit.GetPosition());
+                reachDestination = 1f;
+                if (Vector3.Distance(transform.position, targetUnit.transform.position) < reachDestination)
+                {
+                    currentState = State.Attacking;
+                }
+                break;
+            case State.Attacking:
+                attackTime -= Time.deltaTime;
+                float attackTimerMax = 1f;
+                if(attackTime < 0) 
+                {
+                    attackTime += attackTimerMax;
+                    Debug.Log("Attacking");
+                    targetUnit.Damage(20);
+                    if(targetUnit.IsDead())
+                    {
+                        MoveAndResetState(GetPosition());
+                    }
+                }
+                break;
+
+
         }
     }
 
@@ -126,5 +166,34 @@ public class RtsUnit : MonoBehaviour
         currentState = State.GoingTo_Gathering;
     }
 
-    
+    public void Damage(int amount)
+    {
+        healthSystem.Damage(amount);
+    }
+
+    public bool IsEnemy()
+    {
+        return isEnemy;
+    }
+
+    public void SetTarget(RtsUnit targetUnit)
+    {
+        this.targetUnit = targetUnit;
+        currentState = State.MoveToTarget;
+    }    
+
+    public Vector3 GetPosition()
+    {
+        return transform.position;
+    }
+
+    public HealthSystem GetHealthSystem()
+    {
+        return healthSystem;
+    }
+
+    public bool IsDead()
+    {
+        return healthSystem.IsDead();
+    }
 }
