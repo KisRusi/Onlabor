@@ -8,10 +8,15 @@ using UnityEngine.UI;
 public class RTSMain : MonoBehaviour
 {
     private List<RtsUnit> selectedUnits;
-    [SerializeField]private Player player;
+    [SerializeField]
+    private Player player;
 
-    [SerializeField]private Transform selectedArea = null;
-    [SerializeField]private Transform barrackPanel = null;
+    [SerializeField]
+    private Transform selectedArea = null;
+
+    [SerializeField]
+    private Transform barrackPanel = null;
+
     private Vector3 startpos;
     
     private void Start()
@@ -80,7 +85,7 @@ public class RTSMain : MonoBehaviour
         {
             selectedArea.gameObject.SetActive(true);
             startpos = MoveToClick.GetMousePosition();
-            if(EventSystem.current.IsPointerOverGameObject())
+            if (EventSystem.current.IsPointerOverGameObject() && EventSystem.current.currentSelectedGameObject == GameObject.Find("UnitSpawn"))
             {
                 barrackPanel.gameObject.SetActive(true);
                 return;
@@ -180,4 +185,6 @@ public class RTSMain : MonoBehaviour
         player.IsSelected = false;
         selectedUnits.Clear();
     }
+
+    
 }

@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class Barrack : MonoBehaviour
 {
-    [SerializeField] private GameObject unitToSpawn;
+    [SerializeField] 
+    private GameObject unitToSpawn;
+
     public GameObject prefab;
     BuildingManager buildingManager;
     private Vector3 pos;
@@ -34,6 +36,5 @@ public class Barrack : MonoBehaviour
         pos = e.gameObject.transform.position;
         Debug.Log(pos);
     }
-
 
 }

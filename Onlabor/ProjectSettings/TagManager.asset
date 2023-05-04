@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Colliding
   - Storage
+  - AbilityButton
   layers:
   - Default
   - TransparentFX

@@ -142,5 +142,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unitToSpawn: {fileID: 7836736964807901879, guid: 7e69f72ee6ff55a4aa6017f3f4a8a78a,
     type: 3}
+  barrackPanel: {fileID: 1086259453330656604, guid: 7c23589424c2ed04d98ace753da89ef7,
+    type: 3}
   prefab: {fileID: 7552117484148362020}
-  lastBarrack: {fileID: 7552117484148362020}

@@ -107,12 +107,18 @@ public class RtsUnit : MonoBehaviour, IGetHealthSystem
                 }
                 break;
             case State.MoveToTarget:
-                MoveToDestination(targetUnit.GetPosition());
-                reachDestination = 1f;
-                if (Vector3.Distance(transform.position, targetUnit.transform.position) < reachDestination)
+                if (targetUnit.IsDead())
+                    MoveAndResetState(GetPosition());
+                else
                 {
-                    currentState = State.Attacking;
+                    MoveToDestination(targetUnit.GetPosition());
+                    reachDestination = 1f;
+                    if (Vector3.Distance(transform.position, targetUnit.transform.position) < reachDestination)
+                    {
+                        currentState = State.Attacking;
+                    }
                 }
+                
                 break;
             case State.Attacking:
                 attackTime -= Time.deltaTime;
@@ -135,7 +141,8 @@ public class RtsUnit : MonoBehaviour, IGetHealthSystem
 
     private void BuildingManager_OnStoragePlaced(object sender, BuildingManager.OnStoragePlaceEventArgs e)
     {
-        
+        if (isEnemy)
+            return;
         GameObject placedResourceStorage = e.gameObject;
         float distanceToStorage = Vector3.Distance(transform.position, resourceStorage.transform.position);
         float distanceToPlacedStorage = Vector3.Distance(transform.position,placedResourceStorage.transform.position);
@@ -168,6 +175,8 @@ public class RtsUnit : MonoBehaviour, IGetHealthSystem
 
     public void Damage(int amount)
     {
+        if (IsDead())
+            return;
         healthSystem.Damage(amount);
     }
 
