@@ -11,8 +11,12 @@ public class Player : MonoBehaviour, IGetHealthSystem
     private NavMeshAgent navMeshAgent;
     private bool isSelected;
     private GameObject selectedCircle;
+    private GameObject areaDamageCircle;
     private HealthSystem healthSystem;
     private AbilityState abilityState;
+
+    [SerializeField]
+    private LayerMask layerMask;
 
     public enum AbilityState
     {
@@ -31,6 +35,7 @@ public class Player : MonoBehaviour, IGetHealthSystem
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
         selectedCircle = transform.Find("Selected").gameObject;
+        areaDamageCircle = transform.Find("AreaDamageCircle").gameObject;
         healthSystem = new HealthSystem(200);
         SetSelected(false);
 
@@ -95,9 +100,12 @@ public class Player : MonoBehaviour, IGetHealthSystem
 
     public void Ability1()
     {
-        //TODO
-        Debug.Log("Ability1");
-        abilityState = AbilityState.Idle;
+        
+        areaDamageCircle.SetActive(true);
+        areaDamageCircle.transform.position = GetMousePos();
+        if(Input.GetMouseButtonDown(0))
+            abilityState = AbilityState.Idle;
+        
     }
 
     public void Ability2()
@@ -113,6 +121,22 @@ public class Player : MonoBehaviour, IGetHealthSystem
         Debug.Log("Ability3");
         abilityState = AbilityState.Idle;
     }
+
+    public Vector3 GetMousePos()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Vector3 position;
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit, 1000, layerMask))
+        {
+            position = hit.point;
+            position.y = 0.01f;
+            return position;
+        }
+        return Vector3.zero;
+    }
+
 
 
 }
