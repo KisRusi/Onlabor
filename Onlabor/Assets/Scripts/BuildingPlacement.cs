@@ -13,8 +13,7 @@ public class BuildingPlacement : MonoBehaviour
     }
 
     private void OnTriggerEnter(Collider other)
-    {
-        Debug.Log("Trigger");
+    { 
         if(other.gameObject.CompareTag("Colliding"))
         {
             buildingManager.canPlace = false;
