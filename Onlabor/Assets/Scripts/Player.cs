@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using CodeMonkey.HealthSystemCM;
 using System;
+using System.Linq;
 
 public class Player : MonoBehaviour, IGetHealthSystem
 {
@@ -14,7 +15,11 @@ public class Player : MonoBehaviour, IGetHealthSystem
     private GameObject areaDamageCircle;
     private HealthSystem healthSystem;
     private AbilityState abilityState;
+    private List<GameObject> targetUnits;
+    private float areaDamage;
 
+    public event EventHandler OnAreaDamageCoolDownChange;
+    
     [SerializeField]
     private LayerMask layerMask;
 
@@ -38,8 +43,9 @@ public class Player : MonoBehaviour, IGetHealthSystem
         areaDamageCircle = transform.Find("AreaDamageCircle").gameObject;
         healthSystem = new HealthSystem(200);
         SetSelected(false);
-
+        targetUnits = new List<GameObject>();
         healthSystem.OnDead += HealthSystem_OnDead;
+        areaDamage = 65;
     }
 
     private void HealthSystem_OnDead(object sender, EventArgs e)
@@ -103,22 +109,40 @@ public class Player : MonoBehaviour, IGetHealthSystem
         
         areaDamageCircle.SetActive(true);
         areaDamageCircle.transform.position = GetMousePos();
-        if(Input.GetMouseButtonDown(0))
+        if(Input.GetMouseButtonDown(0) && targetUnits.Count > 0)
+        {
+            if(targetUnits.Count > 1)
+            {
+                var dividedDamage = areaDamage / targetUnits.Count;
+                foreach(var unit in targetUnits)
+                {
+                    unit.GetComponent<RtsUnit>().Damage(dividedDamage);
+                }
+                targetUnits.Clear();
+            }
+            else
+            {
+                targetUnits.FirstOrDefault().GetComponent<RtsUnit>().Damage(areaDamage);
+                targetUnits.Clear();
+            }
+            
+            OnAreaDamageCoolDownChange?.Invoke(this, EventArgs.Empty);
+            areaDamageCircle.SetActive(false);
             abilityState = AbilityState.Idle;
+        }
+            
         
     }
 
     public void Ability2()
     {
         //TODO
-        Debug.Log("Ability2");
         abilityState = AbilityState.Idle;
     }
 
     public void Ability3()
     {
         //TODO
-        Debug.Log("Ability3");
         abilityState = AbilityState.Idle;
     }
 
@@ -137,6 +161,17 @@ public class Player : MonoBehaviour, IGetHealthSystem
         return Vector3.zero;
     }
 
+
+    public void AddTarget(GameObject targetUnit)
+    {
+        targetUnits.Add(targetUnit);
+        Debug.Log(targetUnits);
+    }
+
+    public void RemoveTarget(GameObject targetUnit)
+    {
+        targetUnits.Remove(targetUnit);
+    }
 
 
 }

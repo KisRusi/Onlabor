@@ -50,9 +50,10 @@ public class RtsUnit : MonoBehaviour, IGetHealthSystem
         resourceStorage = GameObject.Find("ResourceStorage");
         buildingManager = GameObject.Find("BuildingManager").GetComponent<BuildingManager>();
         healthSystem = new HealthSystem(100);
-        SetSelected(false);
-
         healthSystem.OnDead += HealthSystem_OnDead;
+        if (this.IsEnemy())
+            return;
+        SetSelected(false);
     }
 
     private void HealthSystem_OnDead(object sender, EventArgs e)
@@ -173,7 +174,7 @@ public class RtsUnit : MonoBehaviour, IGetHealthSystem
         currentState = State.GoingTo_Gathering;
     }
 
-    public void Damage(int amount)
+    public void Damage(float amount)
     {
         if (IsDead())
             return;
