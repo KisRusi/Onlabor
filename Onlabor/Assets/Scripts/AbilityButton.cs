@@ -22,10 +22,7 @@ public class AbilityButton : MonoBehaviour
         switch(abilityButton.name)
         {
             case "Ability1":
-                if(areaDamageAbility.GetCoolDown() <= 0)
-                {
-                    abilityButton.onClick.AddListener(() => player.SwitchState(Player.AbilityState.Ability1));
-                }
+                abilityButton.onClick.AddListener(() => player.SwitchState(Player.AbilityState.Ability1));
                 break;
             case "Ability2":
                 abilityButton.onClick.AddListener(() => player.SwitchState(Player.AbilityState.Ability2));

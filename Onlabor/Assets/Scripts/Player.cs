@@ -5,6 +5,7 @@ using UnityEngine.AI;
 using CodeMonkey.HealthSystemCM;
 using System;
 using System.Linq;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour, IGetHealthSystem
 {
@@ -14,12 +15,13 @@ public class Player : MonoBehaviour, IGetHealthSystem
     private GameObject selectedCircle;
     private GameObject areaDamageCircle;
     private HealthSystem healthSystem;
-    private AbilityState abilityState;
     private List<GameObject> targetUnits;
-    private float areaDamage;
+    private float time = 0;
 
-    public event EventHandler OnAreaDamageCoolDownChange;
-    
+    [SerializeField]
+    private Button btn;
+
+
     [SerializeField]
     private LayerMask layerMask;
 
@@ -30,12 +32,25 @@ public class Player : MonoBehaviour, IGetHealthSystem
         Ability2,
         Ability3,
     }
+
+    public AbilityState abilityState
+    {
+        set;
+        get;
+    }
+
     public bool IsSelected{
         set { isSelected = value;
             selectedCircle.SetActive(value);
         }
         get { return isSelected; }
         }
+
+    public float NextAreaDamageTime
+    {
+        set;
+        get;
+    }
     private void Awake()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
@@ -45,8 +60,11 @@ public class Player : MonoBehaviour, IGetHealthSystem
         SetSelected(false);
         targetUnits = new List<GameObject>();
         healthSystem.OnDead += HealthSystem_OnDead;
-        areaDamage = 65;
+        NextAreaDamageTime = 0;
+        
     }
+
+    
 
     private void HealthSystem_OnDead(object sender, EventArgs e)
     {
@@ -57,12 +75,17 @@ public class Player : MonoBehaviour, IGetHealthSystem
     // Update is called once per frame
     private void Update()
     {
-        switch(abilityState)
+        time = Time.time;
+        if (Time.time > NextAreaDamageTime)
+        {
+            btn.interactable = true;
+        }
+        switch (abilityState)
         {
             case AbilityState.Idle:
                 break;
             case AbilityState.Ability1:
-                Ability1();
+                areaDamageCircle.SetActive(true);
                 break;
             case AbilityState.Ability2:
                 Ability2();
@@ -104,36 +127,6 @@ public class Player : MonoBehaviour, IGetHealthSystem
         IsSelected = true;
     }
 
-    public void Ability1()
-    {
-        
-        areaDamageCircle.SetActive(true);
-        areaDamageCircle.transform.position = GetMousePos();
-        if(Input.GetMouseButtonDown(0) && targetUnits.Count > 0)
-        {
-            if(targetUnits.Count > 1)
-            {
-                var dividedDamage = areaDamage / targetUnits.Count;
-                foreach(var unit in targetUnits)
-                {
-                    unit.GetComponent<RtsUnit>().Damage(dividedDamage);
-                }
-                targetUnits.Clear();
-            }
-            else
-            {
-                targetUnits.FirstOrDefault().GetComponent<RtsUnit>().Damage(areaDamage);
-                targetUnits.Clear();
-            }
-            
-            OnAreaDamageCoolDownChange?.Invoke(this, EventArgs.Empty);
-            areaDamageCircle.SetActive(false);
-            abilityState = AbilityState.Idle;
-        }
-            
-        
-    }
-
     public void Ability2()
     {
         //TODO
@@ -146,26 +139,9 @@ public class Player : MonoBehaviour, IGetHealthSystem
         abilityState = AbilityState.Idle;
     }
 
-    public Vector3 GetMousePos()
-    {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        Vector3 position;
-        RaycastHit hit;
-
-        if (Physics.Raycast(ray, out hit, 1000, layerMask))
-        {
-            position = hit.point;
-            position.y = 0.01f;
-            return position;
-        }
-        return Vector3.zero;
-    }
-
-
     public void AddTarget(GameObject targetUnit)
     {
         targetUnits.Add(targetUnit);
-        Debug.Log(targetUnits);
     }
 
     public void RemoveTarget(GameObject targetUnit)
@@ -173,5 +149,19 @@ public class Player : MonoBehaviour, IGetHealthSystem
         targetUnits.Remove(targetUnit);
     }
 
+    public List<GameObject> GetTargetUnits()
+    {
+        var tmpList = new List<GameObject>();
+        foreach (var unit in targetUnits)
+        {
+            tmpList.Add(unit);
+        }
+        return tmpList;
+    }
+
+    public void ClearTargetUnits()
+    {
+        targetUnits.Clear();
+    }
 
 }

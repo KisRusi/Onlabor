@@ -1,45 +1,68 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
+using static Player;
 
 public class AreaDamageAbility : MonoBehaviour
 {
     [SerializeField]
     private Player player;
-    private float maxCoolDown;
+
     private float coolDownTime;
-    private bool coolDownChanged;
+    private float areaDamage;
 
-    
+    [SerializeField]
+    private LayerMask layerMask;
+    [SerializeField]
+    private Button btn;
 
-    private void Start()
+    private void Awake()
     {
-        maxCoolDown = 5f;
-        coolDownTime = 0f;
-        player.OnAreaDamageCoolDownChange += Player_OnCoolDownChange;
+        coolDownTime = 5;
+        areaDamage = 65;
     }
+    
 
     //Csak akkor megy az update ha active
     private void Update()
     {
-        Debug.Log(coolDownChanged);
-        if(coolDownChanged)
+        if(player.abilityState == AbilityState.Ability1)
         {
-            if(coolDownTime > 0)
+            
+            var targetUnits = player.GetTargetUnits();
+            gameObject.transform.position = GetMousePos();
+            if(Input.GetMouseButtonDown(0) && targetUnits.Count > 0)
             {
-                Debug.Log(coolDownTime);
-                coolDownTime -= Time.deltaTime;
+                if(targetUnits.Count > 1)
+                {
+                    var dividedDamage = areaDamage / targetUnits.Count;
+                    foreach(var unit in targetUnits)
+                    {
+                        unit.GetComponent<RtsUnit>().Damage(dividedDamage);
+                    }
+                    targetUnits.Clear();
+                    player.ClearTargetUnits();
+                }
+                else
+                {
+                    targetUnits.FirstOrDefault().GetComponent<RtsUnit>().Damage(areaDamage);
+                    targetUnits.Clear();
+                    player.ClearTargetUnits();
+                }
+                gameObject.SetActive(false);
+                player.abilityState = AbilityState.Idle;
+                player.NextAreaDamageTime = Time.time + coolDownTime;
+                btn.interactable = false; 
             }
         }
         
     }
 
-    private void Player_OnCoolDownChange(object sender, EventArgs e)
-    {
-        coolDownTime = maxCoolDown;
-        coolDownChanged = true;
-    }
+
+
 
 
 
@@ -66,6 +89,19 @@ public class AreaDamageAbility : MonoBehaviour
         return coolDownTime;
     }
 
+    public Vector3 GetMousePos()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Vector3 position;
+        RaycastHit hit;
 
+        if (Physics.Raycast(ray, out hit, 1000, layerMask))
+        {
+            position = hit.point;
+            position.y = 0.01f;
+            return position;
+        }
+        return Vector3.zero;
+    }
 
 }
