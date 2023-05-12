@@ -14,12 +14,15 @@ public class Player : MonoBehaviour, IGetHealthSystem
     private bool isSelected;
     private GameObject selectedCircle;
     private GameObject areaDamageCircle;
+    private GameObject healArea;
     private HealthSystem healthSystem;
     private List<GameObject> targetUnits;
     private float time = 0;
 
     [SerializeField]
-    private Button btn;
+    private Button btnArea;
+    [SerializeField]
+    private Button btnHeal;
 
 
     [SerializeField]
@@ -51,17 +54,28 @@ public class Player : MonoBehaviour, IGetHealthSystem
         set;
         get;
     }
+    public float NextHealTime
+    {
+        set;
+        get;
+    }
+    public bool IsInHealArea
+    {
+        set;
+        get;
+    }
     private void Awake()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
         selectedCircle = transform.Find("Selected").gameObject;
         areaDamageCircle = transform.Find("AreaDamageCircle").gameObject;
+        healArea = transform.Find("HealArea").gameObject;
         healthSystem = new HealthSystem(200);
         SetSelected(false);
         targetUnits = new List<GameObject>();
         healthSystem.OnDead += HealthSystem_OnDead;
         NextAreaDamageTime = 0;
-        
+        Damage(100);
     }
 
     
@@ -71,6 +85,20 @@ public class Player : MonoBehaviour, IGetHealthSystem
         Destroy(gameObject);
     }
 
+    public void Damage(float amount)
+    {
+        if (IsDead())
+            return;
+        healthSystem.Damage(amount);
+    }
+
+    public void Heal(float amount)
+    {
+        if (healthSystem.GetHealth() >= healthSystem.GetHealthMax())
+            return;
+        healthSystem.Heal(amount);
+    }
+
 
     // Update is called once per frame
     private void Update()
@@ -78,7 +106,11 @@ public class Player : MonoBehaviour, IGetHealthSystem
         time = Time.time;
         if (Time.time > NextAreaDamageTime)
         {
-            btn.interactable = true;
+            btnArea.interactable = true;
+        }
+        if(Time.time > NextHealTime)
+        {
+            btnHeal.interactable = true;
         }
         switch (abilityState)
         {
@@ -88,7 +120,7 @@ public class Player : MonoBehaviour, IGetHealthSystem
                 areaDamageCircle.SetActive(true);
                 break;
             case AbilityState.Ability2:
-                Ability2();
+                healArea.SetActive(true);
                 break;
             case AbilityState.Ability3:
                 Ability3();

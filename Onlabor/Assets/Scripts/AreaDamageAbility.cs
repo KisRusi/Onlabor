@@ -26,7 +26,7 @@ public class AreaDamageAbility : MonoBehaviour
     }
     
 
-    //Csak akkor megy az update ha active
+    
     private void Update()
     {
         if(player.abilityState == AbilityState.Ability1)

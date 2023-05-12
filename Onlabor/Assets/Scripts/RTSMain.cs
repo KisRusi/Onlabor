@@ -8,6 +8,8 @@ using UnityEngine.UI;
 public class RTSMain : MonoBehaviour
 {
     private List<RtsUnit> selectedUnits;
+    private List<GameObject> barracks;
+    private Barrack selectedBarrack;
     [SerializeField]
     private Player player;
 
@@ -27,6 +29,8 @@ public class RTSMain : MonoBehaviour
     private void Awake()
     {
         selectedUnits = new List<RtsUnit>();
+        barracks = new List<GameObject>();
+        selectedBarrack = null;
         selectedArea.gameObject.SetActive(false);
         
     }
@@ -38,7 +42,6 @@ public class RTSMain : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-        
 
         if (Input.GetMouseButtonDown(1))
         {
@@ -46,6 +49,7 @@ public class RTSMain : MonoBehaviour
             {
                 if (raycastHit.collider.TryGetComponent<ResourceNode>(out ResourceNode resourceNode))
                 {
+                    Debug.Log("resourcenode");
                     foreach (var unit in selectedUnits)
                     {
                         unit.SetResourceNode(resourceNode);
@@ -96,6 +100,7 @@ public class RTSMain : MonoBehaviour
                 {
                     
                     barrackPanel.gameObject.SetActive(true);
+                    selectedBarrack = barrack;
                     return;
                 }
                 
@@ -184,6 +189,16 @@ public class RTSMain : MonoBehaviour
         }
         player.IsSelected = false;
         selectedUnits.Clear();
+    }
+
+    public void AddBarrack(GameObject barrack)
+    {
+        barracks.Add(barrack);
+    }
+
+    public Barrack GetSelectedBarrack()
+    {
+        return selectedBarrack;
     }
 
     

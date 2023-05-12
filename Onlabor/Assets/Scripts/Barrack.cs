@@ -11,30 +11,29 @@ public class Barrack : MonoBehaviour
     BuildingManager buildingManager;
     private Vector3 pos;
 
+    private Barrack selectedBarrack;
 
 
-    private void Start()
-    {
-        buildingManager.OnBarrackPlaced += BuildingManager_OnBarrackPlaced;
-    }
+
     private void Awake()
     {
         buildingManager = GameObject.Find("BuildingManager").GetComponent<BuildingManager>();
+        selectedBarrack = null;
     }
+
 
     public void SpawnUnit()
     {
-        Debug.Log("posstart" + pos);
-        GameObject spawnedUnit = Instantiate(unitToSpawn,pos, Quaternion.identity);
-        Debug.Log(pos);
-        spawnedUnit.transform.position = pos;
-        Debug.Log(spawnedUnit.transform.position);
+        pos = transform.localPosition;
+        var brck = GameObject.Find("RtsMain").GetComponent<RTSMain>().GetSelectedBarrack();
+        GameObject spawnedUnit = Instantiate(unitToSpawn,brck.transform.position, transform.rotation);
+
     }
 
-    private void BuildingManager_OnBarrackPlaced(object sender, BuildingManager.OnBarrackPlaceEventArgs e)
-    { 
-        pos = e.gameObject.transform.position;
-        Debug.Log(pos);
+
+    public void SetBarrack(Barrack barrack)
+    {
+        selectedBarrack = barrack;
     }
 
 }

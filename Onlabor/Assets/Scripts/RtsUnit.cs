@@ -54,6 +54,7 @@ public class RtsUnit : MonoBehaviour, IGetHealthSystem
         if (this.IsEnemy())
             return;
         SetSelected(false);
+        Damage(70);
     }
 
     private void HealthSystem_OnDead(object sender, EventArgs e)
@@ -69,9 +70,9 @@ public class RtsUnit : MonoBehaviour, IGetHealthSystem
             case State.Normal:
                 break;
             case State.GoingTo_Gathering:
-
+                Debug.Log("going gathering");
                 MoveToDestination(resourceNode.GetPosition());
-                float reachDestination = 1f;
+                float reachDestination = 2f;
                 if (Vector3.Distance(transform.position,resourceNode.GetPosition()) < reachDestination)
                 {
                     navMeshAgent.ResetPath();
@@ -96,10 +97,10 @@ public class RtsUnit : MonoBehaviour, IGetHealthSystem
                 }
                 break;
             case State.GoingBack_Gathering:
+
                 
-                //Vector3 resourceStorage = new Vector3(1,0,0);
                 MoveToDestination(resourceStorage.transform.position);
-                reachDestination = 1f;
+                reachDestination = 2f;
                 if (Vector3.Distance(transform.position,resourceStorage.transform.position) <  reachDestination)
                 {
                     
@@ -179,6 +180,13 @@ public class RtsUnit : MonoBehaviour, IGetHealthSystem
         if (IsDead())
             return;
         healthSystem.Damage(amount);
+    }
+
+    public void Heal(float amount)
+    {
+        if (healthSystem.GetHealth() >= healthSystem.GetHealthMax())
+            return;
+        healthSystem.Heal(amount);
     }
 
     public bool IsEnemy()

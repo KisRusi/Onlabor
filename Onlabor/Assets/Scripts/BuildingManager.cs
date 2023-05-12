@@ -16,17 +16,11 @@ public  class BuildingManager : MonoBehaviour
     
 
     public event EventHandler<OnStoragePlaceEventArgs> OnStoragePlaced;
-    public event EventHandler<OnBarrackPlaceEventArgs> OnBarrackPlaced;
     public class OnStoragePlaceEventArgs :EventArgs
     {
         public GameObject gameObject;
     }
-
-    public class OnBarrackPlaceEventArgs : EventArgs
-    {
-        public GameObject gameObject;
-    }
-    
+ 
 
     [SerializeField] private LayerMask layerMask;
     [SerializeField] private Material[] materials;
@@ -70,7 +64,7 @@ public  class BuildingManager : MonoBehaviour
         }
         else
         {
-            OnBarrackPlaced?.Invoke(this, new OnBarrackPlaceEventArgs { gameObject = pendingObject.gameObject });
+            GameObject.Find("RtsMain").GetComponent<RTSMain>().AddBarrack(pendingObject);
         }
         
         
