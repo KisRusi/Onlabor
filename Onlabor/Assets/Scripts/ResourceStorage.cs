@@ -4,15 +4,16 @@ using UnityEngine;
 
 public class ResourceStorage : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+
+    private float coolDown;
+
+    private void Awake()
     {
-        
+        coolDown = 5f;
     }
 
-    // Update is called once per frame
-    void Update()
+    public float GetCoolDown()
     {
-        
+        return coolDown;
     }
 }

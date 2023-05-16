@@ -12,13 +12,14 @@ public class Barrack : MonoBehaviour
     private Vector3 pos;
 
     private Barrack selectedBarrack;
-
+    private float coolDown;
 
 
     private void Awake()
     {
         buildingManager = GameObject.Find("BuildingManager").GetComponent<BuildingManager>();
         selectedBarrack = null;
+        coolDown = 5f;
     }
 
 

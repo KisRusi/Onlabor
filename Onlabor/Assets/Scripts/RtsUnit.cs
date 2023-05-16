@@ -143,6 +143,7 @@ public class RtsUnit : MonoBehaviour, IGetHealthSystem
 
     private void BuildingManager_OnStoragePlaced(object sender, BuildingManager.OnStoragePlaceEventArgs e)
     {
+        
         if (isEnemy)
             return;
         GameObject placedResourceStorage = e.gameObject;

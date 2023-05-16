@@ -25,10 +25,11 @@ public  class BuildingManager : MonoBehaviour
     [SerializeField] private LayerMask layerMask;
     [SerializeField] private Material[] materials;
 
-
+ 
     // Update is called once per frame
     void Update()
     {
+         
         if(pendingObject != null)
         {
             pendingObject.transform.position = position;
