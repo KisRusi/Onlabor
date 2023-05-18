@@ -321,6 +321,7 @@ MonoBehaviour:
   unitToSpawn: {fileID: 7836736964807901879, guid: 7e69f72ee6ff55a4aa6017f3f4a8a78a,
     type: 3}
   prefab: {fileID: 7552117484148362020}
+  readyMaterial: {fileID: 2100000, guid: 57fed1196c8bfd748944d67cc7269251, type: 2}
 --- !u!1 &7811517844025817206
 GameObject:
   m_ObjectHideFlags: 0
@@ -330,7 +331,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7559882173445475003}
-  - component: {fileID: 5220499359291271922}
+  - component: {fileID: 4185903824762910461}
   m_Layer: 0
   m_Name: LoadingCircleUI
   m_TagString: Untagged
@@ -359,7 +360,7 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &5220499359291271922
+--- !u!114 &4185903824762910461
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -368,10 +369,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 7811517844025817206}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4e4a086f4a036840a4b23e566801beb, type: 3}
+  m_Script: {fileID: 11500000, guid: 2fce8d3fb3c7bf94e9e2c29a80e39cb6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buildingManager: {fileID: 0}
-  resourceStorage: {fileID: 1792816975310639794, guid: 94908ab5593de0d4295ac0973b951a73,
-    type: 3}
+  barrack: {fileID: 1871226070376689522}
   image: {fileID: 4559108036897255625}

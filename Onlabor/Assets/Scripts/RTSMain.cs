@@ -42,7 +42,6 @@ public class RTSMain : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-
         if (Input.GetMouseButtonDown(1))
         {
             if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit raycastHit))
@@ -96,7 +95,7 @@ public class RTSMain : MonoBehaviour
             }
             if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit raycastHit2) )
             {
-                if (raycastHit2.collider.TryGetComponent<Barrack>(out Barrack barrack))
+                if (raycastHit2.collider.TryGetComponent<Barrack>(out Barrack barrack) && barrack.GetState()== Barrack.State.Idle)
                 {
                     
                     barrackPanel.gameObject.SetActive(true);

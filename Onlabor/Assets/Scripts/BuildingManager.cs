@@ -58,14 +58,19 @@ public  class BuildingManager : MonoBehaviour
 
     public void PlaceObject()
     {
-        pendingObject.GetComponent<MeshRenderer>().material = materials[2];
+        pendingObject.GetComponent<MeshRenderer>().material = materials[3];
         if (isStorage)
         {
             OnStoragePlaced?.Invoke(this, new OnStoragePlaceEventArgs { gameObject = pendingObject.gameObject });
+            pendingObject.GetComponent<ResourceStorage>().SwitchState(ResourceStorage.State.Building);
+            pendingObject.GetComponentInChildren<LoadingCircleUIStorage>(true).SetReadyTime(Time.time);
+            
         }
         else
         {
             GameObject.Find("RtsMain").GetComponent<RTSMain>().AddBarrack(pendingObject);
+            pendingObject.GetComponent<Barrack>().SwitchState(Barrack.State.Building);
+            pendingObject.GetComponentInChildren<LoadingCircleUIBarrack>(true).SetReadyTime(Time.time);
         }
         
         

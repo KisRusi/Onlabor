@@ -146,6 +146,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ee18ee0e44353d4da4b0dc181b8e026, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ready: 0
+  readyMaterial: {fileID: 2100000, guid: 57fed1196c8bfd748944d67cc7269251, type: 2}
 --- !u!23 &3602280955541129536
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -369,5 +371,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   buildingManager: {fileID: 0}
-  resourceStorage: {fileID: 1792816975310639794}
   image: {fileID: 7572416396944207445}
