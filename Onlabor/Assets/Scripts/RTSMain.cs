@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -18,6 +19,8 @@ public class RTSMain : MonoBehaviour
 
     [SerializeField]
     private Transform barrackPanel = null;
+
+    private List<Collider> enemies;
 
     private Vector3 startpos;
     
@@ -63,6 +66,7 @@ public class RTSMain : MonoBehaviour
                             foreach (var unit in selectedUnits)
                             {
                                 unit.SetTarget(targetUnit);
+                                unit.SetEnemies(CheckForEnemeis(raycastHit.point, 4f));
                             }
                         }
 
@@ -200,5 +204,16 @@ public class RTSMain : MonoBehaviour
         return selectedBarrack;
     }
 
-    
+    public List<Collider> CheckForEnemeis(Vector3 position, float radius)
+    {
+        var colliders = Physics.OverlapSphere(position, radius);
+        List<Collider> enemies = new List<Collider>();
+        foreach(var collider in colliders)
+        {
+            if (collider.transform.gameObject.name.Contains("Enemy"))
+                enemies.Add(collider);
+        }
+        return enemies;
+    }
+
 }

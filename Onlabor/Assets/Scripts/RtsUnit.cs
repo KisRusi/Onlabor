@@ -12,6 +12,7 @@ public class RtsUnit : MonoBehaviour, IGetHealthSystem
 
     [SerializeField] private bool isEnemy;
 
+
     public enum State
     {
         Normal,
@@ -35,6 +36,7 @@ public class RtsUnit : MonoBehaviour, IGetHealthSystem
     BuildingManager buildingManager;
     private RtsUnit targetUnit;
     private float attackTime;
+    private List<RtsUnit> enemies;
 
 
     private void Start()
@@ -49,6 +51,7 @@ public class RtsUnit : MonoBehaviour, IGetHealthSystem
         currentState = State.Normal;
         resourceStorage = GameObject.Find("ResourceStorage");
         buildingManager = GameObject.Find("BuildingManager").GetComponent<BuildingManager>();
+        enemies = new List<RtsUnit>();
         healthSystem = new HealthSystem(100);
         healthSystem.OnDead += HealthSystem_OnDead;
         if (this.IsEnemy())
@@ -123,16 +126,18 @@ public class RtsUnit : MonoBehaviour, IGetHealthSystem
                 
                 break;
             case State.Attacking:
+                if(enemies.Count == 0)
+                    MoveAndResetState(GetPosition());
                 attackTime -= Time.deltaTime;
                 float attackTimerMax = 1f;
                 if(attackTime < 0) 
                 {
                     attackTime += attackTimerMax;
-                    Debug.Log("Attacking");
                     targetUnit.Damage(20);
                     if(targetUnit.IsDead())
                     {
-                        MoveAndResetState(GetPosition());
+                        enemies.Remove(targetUnit);
+                        AutomaticAttackInArea(enemies);
                     }
                 }
                 break;
@@ -214,5 +219,28 @@ public class RtsUnit : MonoBehaviour, IGetHealthSystem
     public bool IsDead()
     {
         return healthSystem.IsDead();
+    }
+
+    public void AutomaticAttackInArea(List<RtsUnit> enemies)
+    {
+        var count = enemies.Count;
+        var random = UnityEngine.Random.Range(0, count);
+        if (count > 0)
+        {
+            SetTarget(enemies[random].transform.GetComponent<RtsUnit>());
+            if (enemies[random].transform.GetComponent<RtsUnit>().IsDead())
+            {
+                this.enemies.Remove(enemies[random]);
+            }
+        }
+        
+    }
+
+    public void SetEnemies(List<Collider> enemyColliders)
+    {
+        foreach(Collider collider in enemyColliders)
+        {
+            enemies.Add(collider.transform.gameObject.GetComponent<RtsUnit>());
+        }
     }
 }
