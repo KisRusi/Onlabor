@@ -13,6 +13,7 @@ public  class BuildingManager : MonoBehaviour
     private RaycastHit hit;
     public bool canPlace = true;
     private bool isStorage = false;
+    private bool isBarrack = false;
     
 
     public event EventHandler<OnStoragePlaceEventArgs> OnStoragePlaced;
@@ -66,16 +67,23 @@ public  class BuildingManager : MonoBehaviour
             pendingObject.GetComponentInChildren<LoadingCircleUIStorage>(true).SetReadyTime(Time.time);
             
         }
-        else
+        else if(isBarrack)
         {
             GameObject.Find("RtsMain").GetComponent<RTSMain>().AddBarrack(pendingObject);
             pendingObject.GetComponent<Barrack>().SwitchState(Barrack.State.Building);
             pendingObject.GetComponentInChildren<LoadingCircleUIBarrack>(true).SetReadyTime(Time.time);
         }
-        
-        
+        else
+        {
+            Debug.Log("turret");
+            pendingObject.GetComponent<Turret>().SwitchState(Turret.State.Building);
+            pendingObject.GetComponentInChildren<LoadingCircleUITurret>(true).SetReadyTime(Time.time);
+        }
+
+
         pendingObject = null;
         isStorage = false;
+        isBarrack = false;
     }
 
     public void SelectObject(int index)
@@ -84,7 +92,12 @@ public  class BuildingManager : MonoBehaviour
         {
             isStorage = true;
         }
-        pendingObject = Instantiate(objects[index], position, transform.rotation);
+        if(index == 1)
+        {
+            isBarrack = true;
+        }
+        Vector3 pos = new Vector3 { x = position.x, y = 0.5f, z = position.z};
+        pendingObject = Instantiate(objects[index], pos, transform.rotation);
     }
 
     void UpdateMaterials()
