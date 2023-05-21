@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -20,7 +22,7 @@ public class RTSMain : MonoBehaviour
     [SerializeField]
     private Transform barrackPanel = null;
 
-    private List<Collider> enemies;
+    private List<RtsUnit> enemies;
 
     private Vector3 startpos;
     
@@ -35,7 +37,7 @@ public class RTSMain : MonoBehaviour
         barracks = new List<GameObject>();
         selectedBarrack = null;
         selectedArea.gameObject.SetActive(false);
-        
+        enemies = new List<RtsUnit>();
     }
 
     private void FixedUpdate()
@@ -66,7 +68,7 @@ public class RTSMain : MonoBehaviour
                             foreach (var unit in selectedUnits)
                             {
                                 unit.SetTarget(targetUnit);
-                                unit.SetEnemies(CheckForEnemeis(raycastHit.point, 4f));
+                                enemies = CheckForEnemeis(raycastHit.point, 4f);
                             }
                         }
 
@@ -170,7 +172,6 @@ public class RTSMain : MonoBehaviour
                     {
                         unit.SetSelected(true);
                         selectedUnits.Add(unit);
-
                     }
                 }
                 if(col.GetComponent<Player>())
@@ -183,6 +184,8 @@ public class RTSMain : MonoBehaviour
 
         
     }
+
+    
 
     private void UnSelectUnits()
     {
@@ -204,16 +207,25 @@ public class RTSMain : MonoBehaviour
         return selectedBarrack;
     }
 
-    public List<Collider> CheckForEnemeis(Vector3 position, float radius)
+    public List<RtsUnit> CheckForEnemeis(Vector3 position, float radius)
     {
         var colliders = Physics.OverlapSphere(position, radius);
-        List<Collider> enemies = new List<Collider>();
         foreach(var collider in colliders)
         {
-            if (collider.transform.gameObject.name.Contains("Enemy"))
-                enemies.Add(collider);
+            if (collider.transform.gameObject.name.Contains("Enemy")&& !enemies.Contains(collider.gameObject.GetComponent<RtsUnit>()))
+                enemies.Add(collider.transform.gameObject.GetComponent<RtsUnit>());
         }
         return enemies;
     }
 
+    public void RemoveEnemy(RtsUnit deadEnemy)
+    {
+        enemies.Remove(deadEnemy);
+    }
+
+    public List<RtsUnit> GetEnemies()
+    {
+        return enemies;
+    }
+    
 }

@@ -6,6 +6,8 @@ using UnityEngine;
 using UnityEngine.AI;
 using CodeMonkey.HealthSystemCM;
 using System;
+using static BuildingManager;
+using System.Linq;
 
 public class RtsUnit : MonoBehaviour, IGetHealthSystem
 {
@@ -29,6 +31,7 @@ public class RtsUnit : MonoBehaviour, IGetHealthSystem
     private float gatheringTime;
     private int resourceAmount;
     private State currentState;
+    private RTSMain rtsMain;
     private GameObject selectedCircle;
     private ResourceNode resourceNode;
     private GameObject resourceStorage;
@@ -36,14 +39,15 @@ public class RtsUnit : MonoBehaviour, IGetHealthSystem
     BuildingManager buildingManager;
     private RtsUnit targetUnit;
     private float attackTime;
-    private List<RtsUnit> enemies;
 
 
     private void Start()
     {
         buildingManager.OnStoragePlaced += BuildingManager_OnStoragePlaced;
-
     }
+
+    
+
     private void Awake()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
@@ -51,9 +55,9 @@ public class RtsUnit : MonoBehaviour, IGetHealthSystem
         currentState = State.Normal;
         resourceStorage = GameObject.Find("ResourceStorage");
         buildingManager = GameObject.Find("BuildingManager").GetComponent<BuildingManager>();
-        enemies = new List<RtsUnit>();
         healthSystem = new HealthSystem(100);
         healthSystem.OnDead += HealthSystem_OnDead;
+        rtsMain = GameObject.Find("RtsMain").GetComponent<RTSMain>();
         if (this.IsEnemy())
             return;
         SetSelected(false);
@@ -126,7 +130,7 @@ public class RtsUnit : MonoBehaviour, IGetHealthSystem
                 
                 break;
             case State.Attacking:
-                if(enemies.Count == 0)
+                if(rtsMain.GetEnemies().Count == 0)
                     MoveAndResetState(GetPosition());
                 attackTime -= Time.deltaTime;
                 float attackTimerMax = 1f;
@@ -136,8 +140,8 @@ public class RtsUnit : MonoBehaviour, IGetHealthSystem
                     targetUnit.Damage(20);
                     if(targetUnit.IsDead())
                     {
-                        enemies.Remove(targetUnit);
-                        AutomaticAttackInArea(enemies);
+                        rtsMain.GetEnemies().Remove(targetUnit);
+                        AutomaticAttackInArea(rtsMain.GetEnemies());
                     }
                 }
                 break;
@@ -230,17 +234,10 @@ public class RtsUnit : MonoBehaviour, IGetHealthSystem
             SetTarget(enemies[random].transform.GetComponent<RtsUnit>());
             if (enemies[random].transform.GetComponent<RtsUnit>().IsDead())
             {
-                this.enemies.Remove(enemies[random]);
+                rtsMain.RemoveEnemy(enemies[random]);
             }
         }
         
     }
 
-    public void SetEnemies(List<Collider> enemyColliders)
-    {
-        foreach(Collider collider in enemyColliders)
-        {
-            enemies.Add(collider.transform.gameObject.GetComponent<RtsUnit>());
-        }
-    }
 }
