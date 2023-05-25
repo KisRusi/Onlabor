@@ -3,12 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using UnityEditor.UIElements;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class RTSMain : MonoBehaviour
+public class RTSMain : NetworkBehaviour
 {
     private List<RtsUnit> selectedUnits;
     private List<GameObject> barracks;
@@ -28,7 +28,6 @@ public class RTSMain : MonoBehaviour
     
     private void Start()
     {
-        player = GameObject.Find("Player").GetComponent<Player>();
     }
 
     private void Awake()
@@ -38,6 +37,7 @@ public class RTSMain : MonoBehaviour
         selectedBarrack = null;
         selectedArea.gameObject.SetActive(false);
         enemies = new List<RtsUnit>();
+        player = FindAnyObjectByType<Player>().gameObject.GetComponent<Player>();
     }
 
     private void FixedUpdate()
@@ -121,10 +121,11 @@ public class RTSMain : MonoBehaviour
                         selectedUnits.Add(unit);
                     }
                 }
-                if(raycastHit1.collider.GetComponent<Player>())
+                if (raycastHit1.collider.GetComponent<Player>())
                 {
+
                     player.IsSelected = true;
-                
+
                 }
                 return;
             }
@@ -174,10 +175,10 @@ public class RTSMain : MonoBehaviour
                         selectedUnits.Add(unit);
                     }
                 }
-                if(col.GetComponent<Player>())
+                if (col.GetComponent<Player>())
                 {
                     player.IsSelected = true;
-                
+
                 }
             }
         }
@@ -194,6 +195,7 @@ public class RTSMain : MonoBehaviour
             unit.SetSelected(false);
         }
         player.IsSelected = false;
+
         selectedUnits.Clear();
     }
 
