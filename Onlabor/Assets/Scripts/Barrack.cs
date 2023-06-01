@@ -1,9 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Barrack : MonoBehaviour
+public class Barrack : NetworkBehaviour
 {
     [SerializeField] 
     private GameObject unitToSpawn;
