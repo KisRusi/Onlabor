@@ -6,9 +6,8 @@ using CodeMonkey.HealthSystemCM;
 using System;
 using System.Linq;
 using UnityEngine.UI;
-using Unity.Netcode;
 
-public class Player : NetworkBehaviour, IGetHealthSystem
+public class Player : MonoBehaviour, IGetHealthSystem
 {
 
     private NavMeshAgent navMeshAgent;
@@ -26,8 +25,8 @@ public class Player : NetworkBehaviour, IGetHealthSystem
     private Button btnHeal;
 
 
-    //[SerializeField]
-    //private LayerMask layerMask;
+    [SerializeField]
+    private LayerMask layerMask;
 
     public enum AbilityState
     {
@@ -43,15 +42,12 @@ public class Player : NetworkBehaviour, IGetHealthSystem
         get;
     }
 
-    public bool IsSelected
-    {
-        set
-        {
-            isSelected = value;
+    public bool IsSelected{
+        set { isSelected = value;
             selectedCircle.SetActive(value);
         }
         get { return isSelected; }
-    }
+        }
 
     public float NextAreaDamageTime
     {
@@ -67,10 +63,6 @@ public class Player : NetworkBehaviour, IGetHealthSystem
     {
         set;
         get;
-    }
-    private void Start()
-    {
-        DontDestroyOnLoad(gameObject);
     }
     private void Awake()
     {
@@ -111,16 +103,15 @@ public class Player : NetworkBehaviour, IGetHealthSystem
     // Update is called once per frame
     private void Update()
     {
-        //time = Time.time;
-        //if (Time.time > NextAreaDamageTime)
-        //{
-        //    btnArea.interactable = true;
-        //}
-        //if(Time.time > NextHealTime)
-        //{
-        //    btnHeal.interactable = true;
-        //}
-
+        time = Time.time;
+        if (Time.time > NextAreaDamageTime)
+        {
+            btnArea.interactable = true;
+        }
+        if(Time.time > NextHealTime)
+        {
+            btnHeal.interactable = true;
+        }
         switch (abilityState)
         {
             case AbilityState.Idle:
