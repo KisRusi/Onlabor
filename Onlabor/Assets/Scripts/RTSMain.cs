@@ -13,7 +13,7 @@ public class RTSMain : NetworkBehaviour
     private List<RtsUnit> selectedUnits;
     private List<GameObject> barracks;
     private Barrack selectedBarrack;
-    
+    [SerializeField]
     private Player player;
 
     [SerializeField]
@@ -28,22 +28,6 @@ public class RTSMain : NetworkBehaviour
     
     private void Start()
     {
-        if(Player.LocalInstance != null)
-        {
-            player = Player.LocalInstance;
-        }else
-        {
-            Player.OnAnyPlayerSpawned -= Player_OnAnyPlayerSpawned;
-            Player.OnAnyPlayerSpawned += Player_OnAnyPlayerSpawned;
-        }
-    }
-
-    private void Player_OnAnyPlayerSpawned(object sender, EventArgs e)
-    {
-        if (Player.LocalInstance != null)
-        {
-            player = Player.LocalInstance;
-        }
     }
 
     private void Awake()
@@ -53,7 +37,7 @@ public class RTSMain : NetworkBehaviour
         selectedBarrack = null;
         selectedArea.gameObject.SetActive(false);
         enemies = new List<RtsUnit>();
-        //player = FindAnyObjectByType<Player>().gameObject.GetComponent<Player>();
+        player = FindAnyObjectByType<Player>().gameObject.GetComponent<Player>();
     }
 
     private void FixedUpdate()

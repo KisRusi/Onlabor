@@ -10,8 +10,6 @@ using Unity.Netcode;
 
 public class Player : NetworkBehaviour, IGetHealthSystem
 {
-    public static event EventHandler OnAnyPlayerSpawned;
-    public static Player LocalInstance { get; private set; }
 
     private NavMeshAgent navMeshAgent;
     private bool isSelected;
@@ -21,15 +19,11 @@ public class Player : NetworkBehaviour, IGetHealthSystem
     private HealthSystem healthSystem;
     private List<GameObject> targetUnits;
     private float time = 0;
-    private Vector3 startpos;
 
     [SerializeField]
     private Button btnArea;
     [SerializeField]
     private Button btnHeal;
-
-    [SerializeField]
-    private Transform selectedArea = null;
 
 
     //[SerializeField]
@@ -78,23 +72,12 @@ public class Player : NetworkBehaviour, IGetHealthSystem
     {
         DontDestroyOnLoad(gameObject);
     }
-
-    public override void OnNetworkSpawn()
-    {
-        base.OnNetworkSpawn();
-        if(IsOwner)
-        {
-            LocalInstance = this;
-        }
-        OnAnyPlayerSpawned?.Invoke(this, EventArgs.Empty);
-    }
     private void Awake()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
         selectedCircle = transform.Find("Selected").gameObject;
         areaDamageCircle = transform.Find("AreaDamageCircle").gameObject;
         healArea = transform.Find("HealArea").gameObject;
-        selectedArea.gameObject.SetActive(false);
         healthSystem = new HealthSystem(200);
         SetSelected(false);
         targetUnits = new List<GameObject>();
@@ -138,7 +121,6 @@ public class Player : NetworkBehaviour, IGetHealthSystem
         //    btnHeal.interactable = true;
         //}
 
-
         switch (abilityState)
         {
             case AbilityState.Idle:
@@ -154,8 +136,6 @@ public class Player : NetworkBehaviour, IGetHealthSystem
                 break;
         }
     }
-
-    
 
     public void MoveToDestination(Vector3 destination)
     {
