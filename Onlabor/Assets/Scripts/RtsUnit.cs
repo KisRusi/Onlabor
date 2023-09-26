@@ -1,4 +1,3 @@
-using Mono.Cecil;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -20,6 +19,7 @@ public class RtsUnit : MonoBehaviour, IGetHealthSystem
         Normal,
         GoingTo_Gathering,
         GoingBack_Gathering,
+        WaitingForStorage,
         Gathering,
         MoveToTarget,
         Attacking,
@@ -34,16 +34,15 @@ public class RtsUnit : MonoBehaviour, IGetHealthSystem
     private RTSMain rtsMain;
     private GameObject selectedCircle;
     private ResourceNode resourceNode;
-    private GameObject resourceStorage;
+    private GameObject? resourceStorage;
     private NavMeshAgent navMeshAgent;
-    BuildingManager buildingManager;
     private RtsUnit targetUnit;
     private float attackTime;
 
 
     private void Start()
     {
-        buildingManager.OnStoragePlaced += BuildingManager_OnStoragePlaced;
+        
     }
 
     
@@ -53,8 +52,7 @@ public class RtsUnit : MonoBehaviour, IGetHealthSystem
         navMeshAgent = GetComponent<NavMeshAgent>();
         selectedCircle = transform.Find("Selected").gameObject;
         currentState = State.Normal;
-        resourceStorage = GameObject.Find("ResourceStorage");
-        buildingManager = GameObject.Find("BuildingManager").GetComponent<BuildingManager>();
+        resourceStorage = null;
         healthSystem = new HealthSystem(100);
         healthSystem.OnDead += HealthSystem_OnDead;
         rtsMain = GameObject.Find("RtsMain").GetComponent<RTSMain>();
@@ -71,96 +69,123 @@ public class RtsUnit : MonoBehaviour, IGetHealthSystem
 
     private void Update()
     {
-
-        switch(currentState)
+        if (!isEnemy)
         {
-            case State.Normal:
-                break;
-            case State.GoingTo_Gathering:
-                Debug.Log("going gathering");
-                MoveToDestination(resourceNode.GetPosition());
-                float reachDestination = 2f;
-                if (Vector3.Distance(transform.position,resourceNode.GetPosition()) < reachDestination)
-                {
-                    navMeshAgent.ResetPath();
-                    currentState = State.Gathering;
-                }
-                break;
-            case State.Gathering:
-                
-                gatheringTime -= Time.deltaTime;
-                if(gatheringTime < 0)
-                {
-                    float maxGatheringTime = 1f;
-                    gatheringTime += maxGatheringTime;
+            rtsMain.CheckForEnemeis(GetPosition(), 3f);
+            switch (currentState)
+            {
+                case State.Normal:
+                    AutomaticAttackInArea(rtsMain.GetEnemies());
+                    break;
+                case State.GoingTo_Gathering:
+                    Debug.Log("going gathering");
+                    MoveToDestination(resourceNode.GetPosition());
+                    float reachDestination = 2f;
+                    if (Vector3.Distance(transform.position,resourceNode.GetPosition()) < reachDestination)
+                    {
+                        navMeshAgent.ResetPath();
+                        currentState = State.Gathering;
+                    }
+                    break;
+                case State.Gathering:
                     
-                    resourceAmount++;
-                    Debug.Log("Gather!"+ resourceAmount);
-                    int maxResourceAmount = 3;
-                    if(resourceAmount > maxResourceAmount)
+                    gatheringTime -= Time.deltaTime;
+                    if(gatheringTime < 0)
+                    {
+                        float maxGatheringTime = 1f;
+                        gatheringTime += maxGatheringTime;
+                        
+                        resourceAmount++;
+                        Debug.Log("Gather!"+ resourceAmount);
+                        int maxResourceAmount = 3;
+                        if(resourceAmount > maxResourceAmount)
+                        {
+                            currentState = State.GoingBack_Gathering;
+                        }
+                    }
+                    break;
+                case State.GoingBack_Gathering:
+
+                    CheckForResourceStorage();
+                    if(resourceStorage == null)
+                    {
+                        currentState = State.WaitingForStorage;
+                        goto case State.WaitingForStorage;
+                    }
+                    MoveToDestination(resourceStorage.transform.position);
+                    reachDestination = 2f;
+                    if (Vector3.Distance(transform.position,resourceStorage.transform.position) <  reachDestination)
+                    {
+                        
+                        resourceAmount = 0;
+                        currentState = State.GoingTo_Gathering;
+                    }
+                    break;
+                case State.WaitingForStorage:
+                    CheckForResourceStorage();
+                    if(resourceStorage !=null)
                     {
                         currentState = State.GoingBack_Gathering;
                     }
-                }
-                break;
-            case State.GoingBack_Gathering:
-
-                
-                MoveToDestination(resourceStorage.transform.position);
-                reachDestination = 2f;
-                if (Vector3.Distance(transform.position,resourceStorage.transform.position) <  reachDestination)
-                {
+                    break;
+                case State.MoveToTarget:
+                    if (targetUnit.IsDead())
+                    {
+                        MoveAndResetState(GetPosition());
+                        //AutomaticAttackInArea(rtsMain.GetEnemies());
+                    }
+                    else
+                    {
+                        MoveToDestination(targetUnit.GetPosition());
+                        reachDestination = 1f;
+                        if (Vector3.Distance(transform.position, targetUnit.transform.position) < reachDestination)
+                        {
+                            currentState = State.Attacking;
+                        }
+                    }
                     
-                    resourceAmount = 0;
-                    currentState = State.GoingTo_Gathering;
-                }
-                break;
-            case State.MoveToTarget:
-                if (targetUnit.IsDead())
-                    MoveAndResetState(GetPosition());
-                else
-                {
-                    MoveToDestination(targetUnit.GetPosition());
-                    reachDestination = 1f;
-                    if (Vector3.Distance(transform.position, targetUnit.transform.position) < reachDestination)
+                    break;
+                case State.Attacking:
+                    if(rtsMain.GetEnemies().Count == 0)
+                        MoveAndResetState(GetPosition());
+                    attackTime -= Time.deltaTime;
+                    float attackTimerMax = 1f;
+                    if(attackTime < 0) 
                     {
-                        currentState = State.Attacking;
+                        attackTime += attackTimerMax;
+                        targetUnit.Damage(20);
+
+                        Debug.Log(name + "attack");
+
+                        if(targetUnit.IsDead())
+                        {
+                            rtsMain.GetEnemies().Remove(targetUnit);
+                            AutomaticAttackInArea(rtsMain.GetEnemies());
+                        }
                     }
-                }
-                
-                break;
-            case State.Attacking:
-                if(rtsMain.GetEnemies().Count == 0)
-                    MoveAndResetState(GetPosition());
-                attackTime -= Time.deltaTime;
-                float attackTimerMax = 1f;
-                if(attackTime < 0) 
-                {
-                    attackTime += attackTimerMax;
-                    targetUnit.Damage(20);
-                    if(targetUnit.IsDead())
-                    {
-                        rtsMain.GetEnemies().Remove(targetUnit);
-                        AutomaticAttackInArea(rtsMain.GetEnemies());
-                    }
-                }
-                break;
+                    break;
 
 
+            }
         }
     }
 
-    private void BuildingManager_OnStoragePlaced(object sender, BuildingManager.OnStoragePlaceEventArgs e)
+    private void CheckForResourceStorage()
     {
-        
-        if (isEnemy)
-            return;
-        GameObject placedResourceStorage = e.gameObject;
-        float distanceToStorage = Vector3.Distance(transform.position, resourceStorage.transform.position);
-        float distanceToPlacedStorage = Vector3.Distance(transform.position,placedResourceStorage.transform.position);
-        if (distanceToPlacedStorage < distanceToStorage)
-            resourceStorage = placedResourceStorage;
-        return;
+        foreach(var storage in RTSMain.Instance.resourceStorages)
+        {
+            if(resourceStorage == null)
+            {
+                resourceStorage = storage;
+                continue;
+            }
+            float distanceToCurrentStorage = Vector3.Distance(transform.position, resourceStorage.transform.position);
+            float distanceToNextStorage = Vector3.Distance(transform.position,storage.transform.position);
+            if(distanceToNextStorage < distanceToCurrentStorage)
+            {
+                resourceStorage = storage;
+            }
+        }
     }
 
     public void MoveToDestination(Vector3 destination)

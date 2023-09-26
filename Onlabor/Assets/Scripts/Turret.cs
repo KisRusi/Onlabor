@@ -32,6 +32,7 @@ public class Turret : MonoBehaviour
         switch (currentState)
         {
             case State.Idle:
+                RTSMain.Instance.CheckForEnemeis(transform.position, 4f);
                 break;
             case State.Building:
                 GetComponentInChildren<CanvasScaler>(true).gameObject.SetActive(true);

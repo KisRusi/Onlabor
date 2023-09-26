@@ -1,7 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using static BuildingManager;
 
 public class ResourceStorage : MonoBehaviour
 {
@@ -21,6 +23,13 @@ public class ResourceStorage : MonoBehaviour
         coolDown = 5f;
     }
 
+    public event EventHandler<OnStorageReadyEventArgs> OnStorageReady;
+
+    public class OnStorageReadyEventArgs : EventArgs
+    {
+        public GameObject gameObject;
+    }
+
     private void Update()
     {
         switch(currentState)
@@ -31,6 +40,7 @@ public class ResourceStorage : MonoBehaviour
                 GetComponentInChildren<CanvasScaler>(true).gameObject.SetActive(true);
                 break;
             case State.Ready:
+                OnStorageReady?.Invoke(this, new OnStorageReadyEventArgs { gameObject = this.gameObject});
                 gameObject.GetComponent<MeshRenderer>().material = readyMaterial;
                 SwitchState(State.Idle);
                 break;

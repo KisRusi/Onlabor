@@ -12,7 +12,7 @@ public class Barrack : MonoBehaviour
     BuildingManager buildingManager;
     private Vector3 pos;
 
-    private Barrack selectedBarrack;
+    private Barrack? selectedBarrack;
     private float coolDown;
     private State currentState;
     [SerializeField]
@@ -52,8 +52,17 @@ public class Barrack : MonoBehaviour
     public void SpawnUnit()
     {
         pos = transform.localPosition;
-        var brck = GameObject.Find("RtsMain").GetComponent<RTSMain>().GetSelectedBarrack();
-        GameObject spawnedUnit = Instantiate(unitToSpawn,brck.transform.position, transform.rotation);
+        var brck = RTSMain.Instance.GetSelectedBarrack();
+        var spawnpos = brck.GetComponentInChildren<SpawnMarker>(true).gameObject.transform.position;
+        Instantiate(unitToSpawn,spawnpos, transform.rotation);
+
+    }
+
+    public void SetSpawnMarker()
+    {
+        var brck = RTSMain.Instance.GetSelectedBarrack();
+        brck.GetComponentInChildren<SpawnMarker>(true).gameObject.SetActive(true);
+        brck.GetComponentInChildren<SpawnMarker>(true).IsActive = true;
 
     }
 

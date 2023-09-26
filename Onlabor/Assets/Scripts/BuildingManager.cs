@@ -7,6 +7,8 @@ using UnityEngine.UI;
 
 public  class BuildingManager : MonoBehaviour
 {
+    public static BuildingManager Instance { get; private set; }
+
     public GameObject[] objects;
     private GameObject pendingObject;
     private Vector3 position;
@@ -26,7 +28,11 @@ public  class BuildingManager : MonoBehaviour
     [SerializeField] private LayerMask layerMask;
     [SerializeField] private Material[] materials;
 
- 
+    private void Awake()
+    {
+        Instance = this;
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -62,7 +68,7 @@ public  class BuildingManager : MonoBehaviour
         pendingObject.GetComponent<MeshRenderer>().material = materials[3];
         if (isStorage)
         {
-            OnStoragePlaced?.Invoke(this, new OnStoragePlaceEventArgs { gameObject = pendingObject.gameObject });
+            pendingObject.GetComponent<ResourceStorage>().OnStorageReady += OnStorageReady;
             pendingObject.GetComponent<ResourceStorage>().SwitchState(ResourceStorage.State.Building);
             pendingObject.GetComponentInChildren<LoadingCircleUIStorage>(true).SetReadyTime(Time.time);
             
@@ -75,7 +81,6 @@ public  class BuildingManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("turret");
             pendingObject.GetComponent<Turret>().SwitchState(Turret.State.Building);
             pendingObject.GetComponentInChildren<LoadingCircleUITurret>(true).SetReadyTime(Time.time);
         }
@@ -84,6 +89,11 @@ public  class BuildingManager : MonoBehaviour
         pendingObject = null;
         isStorage = false;
         isBarrack = false;
+    }
+
+    private void OnStorageReady(object sender, ResourceStorage.OnStorageReadyEventArgs e)
+    {
+        OnStoragePlaced?.Invoke(this, new OnStoragePlaceEventArgs { gameObject = e.gameObject });
     }
 
     public void SelectObject(int index)

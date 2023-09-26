@@ -10,8 +10,12 @@ using UnityEngine.UI;
 
 public class RTSMain : MonoBehaviour
 {
+
+    public static RTSMain Instance { get; private set; }
+
     private List<RtsUnit> selectedUnits;
     private List<GameObject> barracks;
+    public List<GameObject> resourceStorages;
     private Barrack selectedBarrack;
     [SerializeField]
     private Player player;
@@ -29,12 +33,17 @@ public class RTSMain : MonoBehaviour
     private void Start()
     {
         player = GameObject.Find("Player").GetComponent<Player>();
+        BuildingManager.Instance.OnStoragePlaced += OnStorage_Placed;
     }
+
+    
 
     private void Awake()
     {
+        Instance = this;
         selectedUnits = new List<RtsUnit>();
         barracks = new List<GameObject>();
+        resourceStorages = new List<GameObject>();
         selectedBarrack = null;
         selectedArea.gameObject.SetActive(false);
         enemies = new List<RtsUnit>();
@@ -68,7 +77,7 @@ public class RTSMain : MonoBehaviour
                             foreach (var unit in selectedUnits)
                             {
                                 unit.SetTarget(targetUnit);
-                                enemies = CheckForEnemeis(raycastHit.point, 4f);
+                                enemies = CheckForEnemeis(raycastHit.point, 3f);
                             }
                         }
 
@@ -94,7 +103,7 @@ public class RTSMain : MonoBehaviour
         {
             selectedArea.gameObject.SetActive(true);
             startpos = MoveToClick.GetMousePosition();
-            if (EventSystem.current.IsPointerOverGameObject() && EventSystem.current.currentSelectedGameObject == GameObject.Find("UnitSpawn"))
+            if (EventSystem.current.IsPointerOverGameObject() && EventSystem.current.currentSelectedGameObject == GameObject.Find("UnitSpawn") || EventSystem.current.IsPointerOverGameObject() && EventSystem.current.currentSelectedGameObject == GameObject.Find("Spawn"))
             {
                 barrackPanel.gameObject.SetActive(true);
                 return;
@@ -185,7 +194,10 @@ public class RTSMain : MonoBehaviour
         
     }
 
-    
+    private void OnStorage_Placed(object sender, BuildingManager.OnStoragePlaceEventArgs e)
+    {
+        resourceStorages.Add(e.gameObject);
+    }
 
     private void UnSelectUnits()
     {
@@ -217,6 +229,7 @@ public class RTSMain : MonoBehaviour
         }
         return enemies;
     }
+
 
     public void RemoveEnemy(RtsUnit deadEnemy)
     {
