@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class SpawnMarker : MonoBehaviour
 {
+    private float radius = 4f;
+    private Vector3 parentPos;
     public bool IsActive
     {
         get;
@@ -16,16 +18,42 @@ public class SpawnMarker : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        parentPos = gameObject.GetComponentInParent<Barrack>().transform.position;
     }
+    
 
     // Update is called once per frame
     void Update()
     {
-        //if(IsActive)
-        //{
+        if (IsActive)
+        {
+            gameObject.transform.position = GetMousePos();
+        }
+        if(Input.GetMouseButtonUp(0) && IsActive == true)
+        {
+            if(gameObject.transform.position.x > (parentPos.x + radius))
+            {
+                gameObject.transform.position = new Vector3( parentPos.x + radius, parentPos.y, gameObject.transform.position.z );
+            }
+            if(gameObject.transform.position.z > (parentPos.z + radius)) 
+            {
+                gameObject.transform.position = new Vector3(gameObject.transform.position.x, parentPos.y, parentPos.z + radius);
+            }
+            if (gameObject.transform.position.x < (parentPos.x - radius))
+            {
+                gameObject.transform.position = new Vector3(parentPos.x - radius, parentPos.y, gameObject.transform.position.z);
+            }
+            if (gameObject.transform.position.z < (parentPos.z - radius))
+            {
+                gameObject.transform.position = new Vector3(gameObject.transform.position.x, parentPos.y, parentPos.z - radius);
+            }
+            SetActive(false);
+        }
 
-        //}
+        if(RTSMain.Instance.GetSelectedBarrack() == null)
+        {
+            gameObject.SetActive(false);
+        }
     }
 
 
@@ -42,5 +70,10 @@ public class SpawnMarker : MonoBehaviour
             return position;
         }
         return Vector3.zero;
+    }
+
+    public void SetActive(bool value)
+    {
+        this.IsActive = value;
     }
 }

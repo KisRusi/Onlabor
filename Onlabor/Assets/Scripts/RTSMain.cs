@@ -115,10 +115,26 @@ public class RTSMain : MonoBehaviour
                     
                     barrackPanel.gameObject.SetActive(true);
                     selectedBarrack = barrack;
+                    selectedBarrack.GetComponentInChildren<SpawnMarker>(true).gameObject.SetActive(true);
                     return;
                 }
                 
             }
+
+            if(selectedBarrack != null && Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit raycastHit3))
+            {
+                if(raycastHit3.collider.TryGetComponent<SpawnMarker>(out SpawnMarker marker))
+                {
+                    barrackPanel.gameObject.SetActive(true);
+                    return;
+                }
+                else
+                {
+                    selectedBarrack = null;
+                }
+            }
+            
+
 
             if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit raycastHit1) && Input.GetKey(KeyCode.LeftShift))
             {
@@ -137,24 +153,36 @@ public class RTSMain : MonoBehaviour
                 }
                 return;
             }
+
+            
             
             UnSelectUnits();
             barrackPanel.gameObject.SetActive(false);
         }
 
+
         if(Input.GetMouseButton(0))
         {
+            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit raycastHit3))
+            {
+                if (raycastHit3.collider.TryGetComponent<SpawnMarker>(out SpawnMarker marker))
+                {
+                    marker.SetActive(true);
+                    selectedArea.gameObject.SetActive(false);
+                }
+
+            }
+            
+
             Vector3 currentPos = MoveToClick.GetMousePosition();
-            Vector3 lowerLeft = new Vector3(Mathf.Min(startpos.x, currentPos.x) , 0.1f, Mathf.Min(startpos.z, currentPos.z));
+            Vector3 lowerLeft = new Vector3(Mathf.Min(startpos.x, currentPos.x), 0.1f, Mathf.Min(startpos.z, currentPos.z));
             Vector3 upperRight = new Vector3(Mathf.Max(startpos.x, currentPos.x), 0.1f, Mathf.Max(startpos.z, currentPos.z));
 
-            Vector3 boxCenter = (lowerLeft + upperRight) /2 ;
+            Vector3 boxCenter = (lowerLeft + upperRight) / 2;
             selectedArea.position = boxCenter;
-            
-            selectedArea.localScale = upperRight-lowerLeft;
-            
 
-
+            selectedArea.localScale = upperRight - lowerLeft;
+            
         }
 
         if(Input.GetMouseButtonUp(0))
@@ -240,5 +268,6 @@ public class RTSMain : MonoBehaviour
     {
         return enemies;
     }
+    
     
 }

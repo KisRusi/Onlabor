@@ -62,8 +62,6 @@ public class Barrack : MonoBehaviour
     {
         var brck = RTSMain.Instance.GetSelectedBarrack();
         brck.GetComponentInChildren<SpawnMarker>(true).gameObject.SetActive(true);
-        brck.GetComponentInChildren<SpawnMarker>(true).IsActive = true;
-
     }
 
 
