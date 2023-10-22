@@ -38,6 +38,7 @@ public class RtsUnit : MonoBehaviour, IGetHealthSystem
     private NavMeshAgent navMeshAgent;
     private RtsUnit targetUnit;
     private float attackTime;
+    private List<RtsUnit> enemies;
 
 
     private void Start()
@@ -53,6 +54,7 @@ public class RtsUnit : MonoBehaviour, IGetHealthSystem
         selectedCircle = transform.Find("Selected").gameObject;
         currentState = State.Normal;
         resourceStorage = null;
+        enemies = new List<RtsUnit>();
         healthSystem = new HealthSystem(100);
         healthSystem.OnDead += HealthSystem_OnDead;
         rtsMain = GameObject.Find("RtsMain").GetComponent<RTSMain>();
@@ -65,17 +67,18 @@ public class RtsUnit : MonoBehaviour, IGetHealthSystem
     private void HealthSystem_OnDead(object sender, EventArgs e)
     {
         Destroy(gameObject);
+        Destroy(gameObject.GetComponent<SphereCollider>());
     }
 
     private void Update()
     {
         if (!isEnemy)
         {
-            rtsMain.CheckForEnemeis(GetPosition(), 3f);
+
             switch (currentState)
             {
                 case State.Normal:
-                    AutomaticAttackInArea(rtsMain.GetEnemies());
+                    AutomaticAttackInArea(transform.position, 3f);
                     break;
                 case State.GoingTo_Gathering:
                     Debug.Log("going gathering");
@@ -132,7 +135,6 @@ public class RtsUnit : MonoBehaviour, IGetHealthSystem
                     if (targetUnit.IsDead())
                     {
                         MoveAndResetState(GetPosition());
-                        //AutomaticAttackInArea(rtsMain.GetEnemies());
                     }
                     else
                     {
@@ -146,22 +148,18 @@ public class RtsUnit : MonoBehaviour, IGetHealthSystem
                     
                     break;
                 case State.Attacking:
-                    if(rtsMain.GetEnemies().Count == 0)
+                    if(enemies.Count == 0)
                         MoveAndResetState(GetPosition());
                     attackTime -= Time.deltaTime;
                     float attackTimerMax = 1f;
-                    if(attackTime < 0) 
+                    if (targetUnit.IsDead())
+                    {
+                        AutomaticAttackInArea(transform.position, 3f);
+                    }
+                    if (attackTime < 0) 
                     {
                         attackTime += attackTimerMax;
                         targetUnit.Damage(20);
-
-                        Debug.Log(name + "attack");
-
-                        if(targetUnit.IsDead())
-                        {
-                            rtsMain.GetEnemies().Remove(targetUnit);
-                            AutomaticAttackInArea(rtsMain.GetEnemies());
-                        }
                     }
                     break;
 
@@ -250,19 +248,28 @@ public class RtsUnit : MonoBehaviour, IGetHealthSystem
         return healthSystem.IsDead();
     }
 
-    public void AutomaticAttackInArea(List<RtsUnit> enemies)
+    public void AutomaticAttackInArea(Vector3 position, float radius)
     {
+        enemies.Clear();
+        enemies = CheckForEnemeis(position, radius);
         var count = enemies.Count;
         var random = UnityEngine.Random.Range(0, count);
         if (count > 0)
         {
             SetTarget(enemies[random].transform.GetComponent<RtsUnit>());
-            if (enemies[random].transform.GetComponent<RtsUnit>().IsDead())
-            {
-                rtsMain.RemoveEnemy(enemies[random]);
-            }
+            currentState = State.Attacking;
         }
         
+    }
+    public List<RtsUnit> CheckForEnemeis(Vector3 position, float radius)
+    {
+        var colliders = Physics.OverlapSphere(position, radius);
+        foreach (var collider in colliders)
+        {
+            if (collider.transform.gameObject.name.Contains("Enemy") && !enemies.Contains(collider.gameObject.GetComponent<RtsUnit>()))
+                enemies.Add(collider.transform.gameObject.GetComponent<RtsUnit>());
+        }
+        return enemies;
     }
 
 }

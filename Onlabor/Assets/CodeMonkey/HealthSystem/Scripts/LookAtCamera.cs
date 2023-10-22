@@ -10,10 +10,10 @@ namespace CodeMonkey.HealthSystemCM {
 
         [SerializeField] private bool invert;
 
-        private Transform mainCameraTransform;
+        [SerializeField] private Transform mainCameraTransform;
 
         private void Awake() {
-            mainCameraTransform = Camera.main.transform;
+            mainCameraTransform = GameObject.Find("CinemachineVirtualCamera").transform;
         }
 
         private void Update() {

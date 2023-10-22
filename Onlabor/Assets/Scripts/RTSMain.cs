@@ -26,8 +26,6 @@ public class RTSMain : MonoBehaviour
     [SerializeField]
     private Transform barrackPanel = null;
 
-    private List<RtsUnit> enemies;
-
     private Vector3 startpos;
     
     private void Start()
@@ -46,7 +44,6 @@ public class RTSMain : MonoBehaviour
         resourceStorages = new List<GameObject>();
         selectedBarrack = null;
         selectedArea.gameObject.SetActive(false);
-        enemies = new List<RtsUnit>();
     }
 
     private void FixedUpdate()
@@ -77,7 +74,7 @@ public class RTSMain : MonoBehaviour
                             foreach (var unit in selectedUnits)
                             {
                                 unit.SetTarget(targetUnit);
-                                enemies = CheckForEnemeis(raycastHit.point, 3f);
+                                //enemies = CheckForEnemeis(raycastHit.point, 3f);
                             }
                         }
 
@@ -245,28 +242,6 @@ public class RTSMain : MonoBehaviour
     public Barrack GetSelectedBarrack()
     {
         return selectedBarrack;
-    }
-
-    public List<RtsUnit> CheckForEnemeis(Vector3 position, float radius)
-    {
-        var colliders = Physics.OverlapSphere(position, radius);
-        foreach(var collider in colliders)
-        {
-            if (collider.transform.gameObject.name.Contains("Enemy")&& !enemies.Contains(collider.gameObject.GetComponent<RtsUnit>()))
-                enemies.Add(collider.transform.gameObject.GetComponent<RtsUnit>());
-        }
-        return enemies;
-    }
-
-
-    public void RemoveEnemy(RtsUnit deadEnemy)
-    {
-        enemies.Remove(deadEnemy);
-    }
-
-    public List<RtsUnit> GetEnemies()
-    {
-        return enemies;
     }
     
     
