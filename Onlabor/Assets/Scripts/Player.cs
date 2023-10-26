@@ -1,10 +1,8 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using CodeMonkey.HealthSystemCM;
 using System;
-using System.Linq;
 using UnityEngine.UI;
 
 public class Player : MonoBehaviour, IGetHealthSystem
@@ -103,6 +101,7 @@ public class Player : MonoBehaviour, IGetHealthSystem
     // Update is called once per frame
     private void Update()
     {
+        ChangeHealthBarColor();
         time = Time.time;
         if (Time.time > NextAreaDamageTime)
         {
@@ -194,6 +193,34 @@ public class Player : MonoBehaviour, IGetHealthSystem
     public void ClearTargetUnits()
     {
         targetUnits.Clear();
+    }
+
+    public void ChangeHealthBarColor()
+    {
+        var images = gameObject.GetComponentInChildren<HealthBarUI>().GetComponentsInChildren<Image>();
+        GameObject healthbar;
+        float healthpercentage = healthSystem.GetHealth() / healthSystem.GetHealthMax();
+        foreach (var image in images)
+        {
+            if (image.name.Contains("Bar"))
+            {
+                healthbar = image.gameObject;
+                if (healthpercentage >= 0.7f)
+                {
+                    healthbar.GetComponent<Image>().color = new Color(0, 1, 0);
+                }
+                else if (healthpercentage >= 0.5f && healthpercentage < 0.7f)
+                {
+                    healthbar.GetComponent<Image>().color = new Color(1, 1, 0);
+                }
+                else if (healthpercentage >= 0.3f && healthpercentage < 0.5f)
+                {
+                    healthbar.GetComponent<Image>().color = new Color(1, 0.64f, 0);
+                }
+                else
+                    return;
+            }
+        }
     }
 
 }

@@ -1,17 +1,14 @@
-using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 using CodeMonkey.HealthSystemCM;
 using System;
-using static BuildingManager;
-using System.Linq;
+using UnityEngine.UI;
 
 public class RtsUnit : MonoBehaviour, IGetHealthSystem
 {
 
-    [SerializeField] private bool isEnemy;
+    [SerializeField] protected bool isEnemy;
 
 
     public enum State
@@ -30,15 +27,15 @@ public class RtsUnit : MonoBehaviour, IGetHealthSystem
     private bool isSelected;
     private float gatheringTime;
     private int resourceAmount;
-    private State currentState;
     private RTSMain rtsMain;
     private GameObject selectedCircle;
     private ResourceNode resourceNode;
     private GameObject? resourceStorage;
-    private NavMeshAgent navMeshAgent;
-    private RtsUnit targetUnit;
-    private float attackTime;
-    private List<RtsUnit> enemies;
+    protected NavMeshAgent navMeshAgent;
+    protected State currentState;
+    protected RtsUnit targetUnit;
+    protected float attackTime;
+    protected List<RtsUnit> enemies;
 
 
     private void Start()
@@ -74,11 +71,11 @@ public class RtsUnit : MonoBehaviour, IGetHealthSystem
     {
         if (!isEnemy)
         {
-
+            ChangeHealthBarColor();
             switch (currentState)
             {
                 case State.Normal:
-                    AutomaticAttackInArea(transform.position, 3f);
+                    AutomaticAttackInArea(transform.position, 3f, 1f);
                     break;
                 case State.GoingTo_Gathering:
                     Debug.Log("going gathering");
@@ -154,7 +151,7 @@ public class RtsUnit : MonoBehaviour, IGetHealthSystem
                     float attackTimerMax = 1f;
                     if (targetUnit.IsDead())
                     {
-                        AutomaticAttackInArea(transform.position, 3f);
+                        AutomaticAttackInArea(transform.position, 3f, 1f);
                     }
                     if (attackTime < 0) 
                     {
@@ -248,7 +245,7 @@ public class RtsUnit : MonoBehaviour, IGetHealthSystem
         return healthSystem.IsDead();
     }
 
-    public void AutomaticAttackInArea(Vector3 position, float radius)
+    public void AutomaticAttackInArea(Vector3 position, float radius, float reachDestination)
     {
         enemies.Clear();
         enemies = CheckForEnemeis(position, radius);
@@ -258,6 +255,11 @@ public class RtsUnit : MonoBehaviour, IGetHealthSystem
         {
             SetTarget(enemies[random].transform.GetComponent<RtsUnit>());
             currentState = State.Attacking;
+            Vector3 dir = (targetUnit.GetPosition() - transform.position).normalized;
+            if (Vector3.Distance(transform.position, targetUnit.transform.position) > 6f)
+            {
+                navMeshAgent.SetDestination(transform.position + (dir * 1.5f));
+            }
         }
         
     }
@@ -272,4 +274,31 @@ public class RtsUnit : MonoBehaviour, IGetHealthSystem
         return enemies;
     }
 
+    public void ChangeHealthBarColor()
+    {
+        var images = gameObject.GetComponentInChildren<HealthBarUI>().GetComponentsInChildren<Image>();
+        GameObject healthbar;
+        float healthpercentage = healthSystem.GetHealth() / healthSystem.GetHealthMax();
+        foreach (var image in images)
+        {
+            if (image.name.Contains("Bar"))
+            {
+                healthbar = image.gameObject;
+                if (healthpercentage >= 0.7f)
+                {
+                    healthbar.GetComponent<Image>().color = new Color(0, 1, 0);
+                }
+                else if (healthpercentage >= 0.5f && healthpercentage < 0.7f)
+                {
+                    healthbar.GetComponent<Image>().color = new Color(1, 1, 0);
+                }
+                else if (healthpercentage >= 0.3f && healthpercentage < 0.5f)
+                {
+                    healthbar.GetComponent<Image>().color = new Color(1, 0.64f, 0);
+                }
+                else
+                    return;
+            }   
+        } 
+    }
 }

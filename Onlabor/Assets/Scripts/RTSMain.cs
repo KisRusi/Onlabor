@@ -59,7 +59,6 @@ public class RTSMain : MonoBehaviour
             {
                 if (raycastHit.collider.TryGetComponent<ResourceNode>(out ResourceNode resourceNode))
                 {
-                    Debug.Log("resourcenode");
                     foreach (var unit in selectedUnits)
                     {
                         unit.SetResourceNode(resourceNode);
@@ -146,7 +145,11 @@ public class RTSMain : MonoBehaviour
                 if(raycastHit1.collider.GetComponent<Player>())
                 {
                     player.IsSelected = true;
-                
+                }
+                if(raycastHit1.collider.TryGetComponent<RangeUnit>(out RangeUnit rangeUnit))
+                {
+                    rangeUnit.SetSelected(true);
+                    selectedUnits.Add(rangeUnit);
                 }
                 return;
             }
