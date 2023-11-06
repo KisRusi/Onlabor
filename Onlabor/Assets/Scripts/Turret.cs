@@ -37,7 +37,6 @@ public class Turret : MonoBehaviour
         switch (currentState)
         {
             case State.Idle:
-                AutomaticAttackInArea(transform.position, 5f);
                 break;
             case State.Building:
                 GetComponentInChildren<CanvasScaler>(true).gameObject.SetActive(true);
