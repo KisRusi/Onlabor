@@ -25,12 +25,13 @@ public class RtsUnit : MonoBehaviour, IGetHealthSystem
     private HealthSystem healthSystem;
 
     private bool isSelected;
-    private float gatheringTime;
-    private int resourceAmount;
     private RTSMain rtsMain;
     private GameObject selectedCircle;
-    private ResourceNode resourceNode;
-    private GameObject? resourceStorage;
+
+    protected GameObject? resourceStorage;
+    protected float gatheringTime;
+    protected int resourceAmount;
+    protected ResourceNode resourceNode;
     protected NavMeshAgent navMeshAgent;
     protected State currentState;
     protected RtsUnit targetUnit;
@@ -45,12 +46,12 @@ public class RtsUnit : MonoBehaviour, IGetHealthSystem
 
     
 
-    private void Awake()
+    protected void Awake()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
         selectedCircle = transform.Find("Selected").gameObject;
         currentState = State.Normal;
-        resourceStorage = null;
+        resourceStorage = GameObject.Find("ResourceStorage");
         enemies = new List<RtsUnit>();
         healthSystem = new HealthSystem(100);
         healthSystem.OnDead += HealthSystem_OnDead;
@@ -77,57 +78,6 @@ public class RtsUnit : MonoBehaviour, IGetHealthSystem
                 case State.Normal:
                     AutomaticAttackInArea(transform.position, 3f, 1f);
                     break;
-                case State.GoingTo_Gathering:
-                    Debug.Log("going gathering");
-                    MoveToDestination(resourceNode.GetPosition());
-                    float reachDestination = 2f;
-                    if (Vector3.Distance(transform.position,resourceNode.GetPosition()) < reachDestination)
-                    {
-                        navMeshAgent.ResetPath();
-                        currentState = State.Gathering;
-                    }
-                    break;
-                case State.Gathering:
-                    
-                    gatheringTime -= Time.deltaTime;
-                    if(gatheringTime < 0)
-                    {
-                        float maxGatheringTime = 1f;
-                        gatheringTime += maxGatheringTime;
-                        
-                        resourceAmount++;
-                        Debug.Log("Gather!"+ resourceAmount);
-                        int maxResourceAmount = 3;
-                        if(resourceAmount > maxResourceAmount)
-                        {
-                            currentState = State.GoingBack_Gathering;
-                        }
-                    }
-                    break;
-                case State.GoingBack_Gathering:
-
-                    CheckForResourceStorage();
-                    if(resourceStorage == null)
-                    {
-                        currentState = State.WaitingForStorage;
-                        goto case State.WaitingForStorage;
-                    }
-                    MoveToDestination(resourceStorage.transform.position);
-                    reachDestination = 2f;
-                    if (Vector3.Distance(transform.position,resourceStorage.transform.position) <  reachDestination)
-                    {
-                        
-                        resourceAmount = 0;
-                        currentState = State.GoingTo_Gathering;
-                    }
-                    break;
-                case State.WaitingForStorage:
-                    CheckForResourceStorage();
-                    if(resourceStorage !=null)
-                    {
-                        currentState = State.GoingBack_Gathering;
-                    }
-                    break;
                 case State.MoveToTarget:
                     if (targetUnit.IsDead())
                     {
@@ -136,7 +86,7 @@ public class RtsUnit : MonoBehaviour, IGetHealthSystem
                     else
                     {
                         MoveToDestination(targetUnit.GetPosition());
-                        reachDestination = 1f;
+                        float reachDestination = 1f;
                         if (Vector3.Distance(transform.position, targetUnit.transform.position) < reachDestination)
                         {
                             currentState = State.Attacking;
@@ -165,7 +115,7 @@ public class RtsUnit : MonoBehaviour, IGetHealthSystem
         }
     }
 
-    private void CheckForResourceStorage()
+    public void CheckForResourceStorage()
     {
         foreach(var storage in RTSMain.Instance.resourceStorages)
         {
