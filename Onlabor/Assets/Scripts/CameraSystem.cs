@@ -10,7 +10,7 @@ public class CameraSystem : MonoBehaviour
     [SerializeField] private CinemachineVirtualCamera cinemachineVirtualCamera;
     [SerializeField] private float FOVMax = 80;
     [SerializeField] private float FOVMin = 10;
-    private float targetFOV = 50;
+    private float targetFOV = 80;
 
    private void Update()
     {

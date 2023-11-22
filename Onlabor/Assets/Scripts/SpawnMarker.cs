@@ -18,7 +18,7 @@ public class SpawnMarker : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        parentPos = gameObject.GetComponentInParent<Barrack>().transform.position;
+        parentPos = gameObject.GetComponentInParent<Transform>().transform.position;
     }
     
 

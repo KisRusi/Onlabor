@@ -1,3 +1,4 @@
+using Onlabor;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -25,6 +26,9 @@ public class RTSMain : MonoBehaviour
 
     [SerializeField]
     private Transform barrackPanel = null;
+
+    [SerializeField]
+    private GameObject actionPanel = null;
 
     private Vector3 startpos;
     
@@ -55,6 +59,9 @@ public class RTSMain : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(1))
         {
+            Debug.Log(selectedUnits.Count);
+            List<Vector3> targetPositionList = FormationManagement.Instance._GetPositionList(selectedUnits.Count);
+            int targetPositionListIndex = 0;
             if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit raycastHit))
             {
                 if (raycastHit.collider.TryGetComponent<ResourceNode>(out ResourceNode resourceNode))
@@ -80,9 +87,14 @@ public class RTSMain : MonoBehaviour
                     }
                     else
                     {
+                        if(selectedUnits.Count == 1)
+                        {
+                            selectedUnits.First().MoveAndResetState(MoveToClick.GetMousePosition());
+                        }
                         foreach (var unit in selectedUnits)
                         {
-                            unit.MoveAndResetState(MoveToClick.GetMousePosition());
+                            unit.MoveAndResetState(targetPositionList[targetPositionListIndex] + MoveToClick.GetMousePosition());
+                            targetPositionListIndex +=1;
                         }
                         if (player.IsSelected)
                         {
@@ -99,6 +111,9 @@ public class RTSMain : MonoBehaviour
         {
             selectedArea.gameObject.SetActive(true);
             startpos = MoveToClick.GetMousePosition();
+
+            
+
             if (EventSystem.current.IsPointerOverGameObject() && EventSystem.current.currentSelectedGameObject == GameObject.Find("UnitSpawn") || EventSystem.current.IsPointerOverGameObject() && EventSystem.current.currentSelectedGameObject == GameObject.Find("Spawn"))
             {
                 barrackPanel.gameObject.SetActive(true);
@@ -129,7 +144,17 @@ public class RTSMain : MonoBehaviour
                     selectedBarrack = null;
                 }
             }
-            
+            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit raycastHit4))
+            {
+                if(raycastHit4.collider.TryGetComponent<BaseBuilding>(out BaseBuilding baseBuilding))
+                {
+                    Debug.Log(baseBuilding);
+                    actionPanel.SetActive(true);
+                    return;
+                }
+            }
+
+
 
 
             if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit raycastHit1) && Input.GetKey(KeyCode.LeftShift))
@@ -205,7 +230,7 @@ public class RTSMain : MonoBehaviour
             {
                 if (col.TryGetComponent<RtsUnit>(out RtsUnit unit))
                 {
-                    if(!unit.IsEnemy())
+                    if(!unit.IsEnemy() && !selectedUnits.Contains(unit))
                     {
                         unit.SetSelected(true);
                         selectedUnits.Add(unit);
